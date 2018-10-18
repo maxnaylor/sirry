@@ -1,0 +1,73 @@
+/* Import core */
+
+@import url("../../styles/core.css");
+
+
+/* Containers */
+
+.container {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+
+/* Navigation */
+
+nav {
+	float: left;
+	width: 100%;
+	border-bottom: 1px solid #efefef;
+	padding: 20px 0 10px 0;
+}
+
+nav img {
+	float: left;
+	width: 32px;
+	height: 32px;
+	margin: 0 10px;
+}
+
+nav h1 {
+	float: left;
+	margin: 0;
+	font-weight: normal;
+	font-sizE: 26px;
+}
+
+
+/* Layout */
+
+section {
+	float: left;
+	width: 100%;
+	margin: 20px 0 0 0;
+}
+
+table {
+	float: left;
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+table th,
+table td {
+	padding: 8px 0;
+	text-align: left;
+}
+
+table th {
+	border-bottom: 2px solid #efefef;
+}
+
+table td {
+	border-bottom: 1px solid #efefef;
+}
+
+table td.empty {
+	padding: 20px 0;
+	border-bottom: none;
+	color: #ccc;
+	text-align: center;
+	font-size: 18px;
+}

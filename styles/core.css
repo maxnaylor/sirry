@@ -1,0 +1,26 @@
+/* Core styles */ 
+
+* {
+	font-family: -apple-system, 'San Francisco Text', 'Roboto', 'Geneva', 'Helvetica', sans-serif;
+	-webkit-appearance: none;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #333333;
+}
+
+input {
+	margin: 0;
+}
+
+a {
+	cursor: pointer;
+	color: #00a3ff;
+	text-decoration: none;
+}
+
+a:hover {
+	border-bottom: 2px solid #00a3ff;
+}
