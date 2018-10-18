@@ -701,44 +701,106 @@
 	font-size: 13px;
 }
 
+/* Petrol prices */ 
 
-
-/* Bus data */ 
-
-.card.bus {
+.card.petrol {
 	padding: 5px 10px;	
 }
 
-.card.bus .row {
+.card.petrol table {
 	float: left;
 	width: 100%;	
-	border-bottom: 1px solid rgba(0,0,0,0.1);
+	border-collapse: collapse;
+	font-size: 15px;
 }
 
-.card.bus .row:last-of-type {
+.card.petrol table tr {
+	border-bottom: 1px solid #efefef;
+}
+
+.card.petrol table tr:last-of-type  {
 	border-bottom: none;
 }
 
-.card.bus .row .route {
-	float: left;
-	background-color: #c9151f;
-	font-size: 23px;
+.card.petrol table th {
+	text-align: left;
+	padding: 5px 0;
+	font-size: 13px;
 	font-weight: bold;
-	color: #fff;
-	padding: 2px 7px;
-	min-width: 30px;
-	margin: 4px 0;
-	text-align: center;
 }
 
-.card.bus .row .arrival {
-	float: left;	
-	font-size: 23px;
-	margin: 6px 0 0 10px;
+.card.petrol table tr td {
+	padding: 5px 0;
 }
 
-.card.bus .row .arrival .minutes {
-	font-size: 75%;
+.card.petrol table tr td.petrol,
+.card.petrol table tr td.diesel {
+	font-weight: bold;
+	font-size: 27px;
+	width: 90px;
+}
+
+.card.petrol table tr td.petrol {
+	color: #41b600;
+}
+
+.card.petrol table tr td span {
+	font-size: 13px;
+}
+
+
+/* News */ 
+
+.card.news {
+	padding: 5px 10px;	
+}
+
+.card.news .row {
+	float: left;
+	width: 100%;	
+	padding: 10px 0;
+	border-top: none;
+	border-bottom: 1px solid rgba(0,0,0,0.1);
+	font-size: 15px;
+}
+
+.card.news .row:last-of-type {
+	border-bottom: none;
+}
+
+.card.news .row p {
+	margin: 0;
+}
+
+.card.news .row .provider {
+	float: left;
+	width: 100%;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 2px 0px 4px 0;
+}
+
+.card.news .row .provider img {
+	float: left;
+	height: 16px;
+}
+
+.card.news .row .headline {
+	padding: 2px 0;
+	font-weight: bold;
+}
+
+.card.news .row .description {
+	font-size: 13px;
+	padding: 2px 0;
+}
+
+.card.news .row .date {
+	float: left;
+	font-size: 13px;
+	padding: 2px 10px;
+	font-weight: normal;
+	color: #ccc;
 }
 
 

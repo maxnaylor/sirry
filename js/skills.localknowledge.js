@@ -105,7 +105,7 @@ function respondPetrol(input) {
 			},
 			error: function(error) {		    
 			    loadingComplete();
-			    appendOutput({ output: 'Ég get sótt þessar upplýsingar í augnablikinu.' });
+			    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
 		    }
 		});
 		return true;
@@ -129,8 +129,22 @@ function diff(a,b) {
 }
 
 function respondCompanyLookup(input) {
-	var respondWhatIsResponse = '';
-	if(input.match(/(hvað|hver) er kennitala ?(hjá) /i)) {
-		console.log('Interpretation: TV schedule request');
+	var response = '';
+	if(input.match(/kennitala/i)) {
+		console.log('Interpretation: Company lookup request');
+		$.ajax({
+			url: 'proxy.php?u=http://apis.is/company/?name=blendin',
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			type: 'GET',
+			success: function(response) {					    
+				loadingComplete();
+			},
+			error: function(error) {		    
+			    loadingComplete();
+			    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
+		    }
+		});
 	}
+	return response;
 }

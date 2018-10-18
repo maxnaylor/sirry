@@ -51,7 +51,7 @@ include_once 'bin/includes.php';
 								break;
 						} 
 						?>
-						<tr>
+						<tr<?php if($row['unknownInput']) { echo ' class="red"'; }; ?>>
 							<td><?php echo $row['id']; ?></td>
 							<td><?php echo $source; ?></td>
 							<td><?php echo $row['text']; ?></td>

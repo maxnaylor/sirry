@@ -6,7 +6,7 @@
 /* Containers */
 
 .container {
-	width: 1000px;
+	width: 100%;
 	margin: 0 auto;
 }
 
@@ -17,7 +17,7 @@ nav {
 	float: left;
 	width: 100%;
 	border-bottom: 1px solid #efefef;
-	padding: 20px 0 10px 0;
+	padding: 10px 0;
 }
 
 nav img {
@@ -52,7 +52,7 @@ table {
 
 table th,
 table td {
-	padding: 8px 0;
+	padding: 8px 15px;
 	text-align: left;
 }
 
@@ -70,4 +70,9 @@ table td.empty {
 	color: #ccc;
 	text-align: center;
 	font-size: 18px;
+}
+
+table tr.red td {
+	color: #d90000;
+	background-color: #ffecec;
 }

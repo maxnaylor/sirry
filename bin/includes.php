@@ -22,6 +22,7 @@
 <script src="js/skills.lookup.js"></script>
 <script src="js/skills.maths.js"></script>
 <script src="js/skills.meta.js"></script>
+<script src="js/skills.news.js"></script>
 <script src="js/skills.personality.js"></script>
 <script src="js/skills.transport.js"></script>
 <script src="js/skills.weather.js"></script>

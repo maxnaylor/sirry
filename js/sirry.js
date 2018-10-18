@@ -166,6 +166,7 @@ function speechNotCompatible() {
 // Parsing
 
 var unsuccessfulResponses = 0;
+var $unknownInput = false;
 
 function parseInput() {	
 	var input = $('#input').val();
@@ -191,6 +192,7 @@ function parseInput() {
 		if(!response) { response = respondArithmetic(input); }
 		if(!response) { response = respondTV(input); }
 		if(!response) { response = respondCompanyLookup(input); }
+		if(!response) { response = respondNews(input); }
 		if(!response) { response = respondWhatIs(input); }
 		if(!response) { response = respondWhatHappened(input); }
 		if(!response) { response = respondBio(input); }
@@ -262,7 +264,7 @@ function cleanInput(input) {
 	input   = input.replace(/^(og|en)/, '');	
 	input   = scrubInput(input);
 	if(input.match(/^(hvað er |hvað eru )/i)) {		
-		if(!input.match(/(klukkan|ég|gömul|gamall|á ensku|í sjónvarpi|í sjónvarpinu|\+|\–|\-|×|÷)/gi)) {
+		if(!input.match(/(klukkan|ég|gömul|gamall|á ensku|í sjónvarpi|í sjónvarpinu|nýtt|helst|\+|\–|\-|×|÷)/gi)) {
 			console.log('Parsed “what is” question');
 			var searchQuery  = input.replace(/(hvað\ er\ |hvað\ eru\ )/gi, '');	
 			var questionVerb = input.split(' ');
@@ -355,8 +357,12 @@ function appendOutput(data) {
 		}
 	}, 500);	
 	// Log response in database
+	if(!data.unknownInput) {
+		data.unknownInput = 0;
+	}
 	var response = {
-		text: data.output
+		text: data.output,
+		unknownInput: data.unknownInput
 	}
 	logResponse(response);
 }
@@ -384,7 +390,7 @@ function respondUnknown() {
 			'Hvað áttu við?'
 		];
 		var randomNumber = Math.floor(Math.random()*respondUnknownResponses.length);
-		appendOutput({ output: respondUnknownResponses[randomNumber], unknownInput: true });
+		appendOutput({ output: respondUnknownResponses[randomNumber], unknownInput: 1 });
 		return true;
 	} else {
 		appendOutput({ output: 'Ég skil ekki hvað þú átt við. Þú getur spurt mig um veðrið.', unknownInput: true });

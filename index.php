@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
-include_once 'bin/library.php'; 
-include_once 'bin/includes.php'; 
+require_once 'bin/library.php'; 
+require_once 'bin/includes.php'; 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -41,7 +41,7 @@ include_once 'bin/includes.php';
 				<td>„Hvað er klukkan?“</td>
 			</tr>
 			<tr>
-				<td>„Hvaða dagur er í dag?“</td>
+				<td>„Hvað er helst í fréttum?“</td>
 				<td>„Hve gömul er Björk Guðmundsdóttir?“</td>
 				<td>„Er hætta á snjóflóði?“</td>
 			</tr>
@@ -55,6 +55,12 @@ include_once 'bin/includes.php';
 		<ul>
 			<li><a>„Hvar er lægsta bensínverðið?“</a></li>
 			<li><a>„Hvað er í sjónvarpinu?“</a></li>
+		</ul>
+		<h1>Fréttir</h1>
+		<ul>
+			<li><a>„Hvað er helst í fréttum?“</a></li>
+			<li><a>„Hvað að frétta erlendis?“</a></li>
+			<li><a>„Sýndu mér nýjustu íþróttafréttir.“</a></li>
 		</ul>
 		<h1>Veður</h1>
 		<ul>

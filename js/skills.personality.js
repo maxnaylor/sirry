@@ -64,14 +64,14 @@ function respondHowAreYou(input) {
 		];
 		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
 		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber];
-	} else if(input.indexOf('hvað er að frétta') >= 0) {
+	/* } else if(input.indexOf('hvað er að frétta') >= 0) {
 		console.log('Interpretation: What’s new?');
 		var respondHowAreYouResponseArray = [
 			'Ekkert spennandi. Ég er enn föst í þessari tölvu.',
 			'Ekki mikið, en hjá þér?'
 		];
 		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
-		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber];
+		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber]; */
 	} else if(input.indexOf('hvað liggur þér á hjarta') >= 0) {
 		console.log('Interpretation: What’s on your mind?');
 		var respondHowAreYouResponseArray = [
@@ -372,7 +372,7 @@ function respondIAm(input) {
 	} else if (input.match(/^(ég segi)/gi)) {
 		console.log('Interpretation: How am I statement');
 		if(!input.match(/(ekki|ekkert)/gi)) {
-			if(input.match(/(allt)?\ ?(gott|fínt|ágætt)\ ?(bara)?/gi)) {
+			if(input.match(/(allt|bara)?\ ?(gott|fínt|ágætt)\ ?(bara)?/gi)) {
 				console.log('Interpretation: Positive how am I statement');
 				appendOutput({ output: 'Gaman að heyra.' });
 				return true;
