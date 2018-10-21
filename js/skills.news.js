@@ -2,7 +2,7 @@
 
 function respondNews(input) {
 	var response = '';
-	if(input.match(/(hvað er|sýndu)? ?(nýtt|helst)? ?(að frétta|frétt)/i)) {
+	if(input.match(/(hvað er|sýndu)? ?(nýtt|helst)? ?(að frétta|frétt|á döfinni)/i)) {
 		respondLoading();	
 		if(input.match(/(hérlendis|innlendar|Ísland)/i)) {
 			// Icelandic news
@@ -47,36 +47,79 @@ function respondNews(input) {
 			var outputString = 'Hér eru nýjustu íþróttafréttir:'
 			console.log('Interpretation: Get sport news');
 		} else {
-			// General news
-			var providers = [{ feedURL: 'http://www.ruv.is/rss/frettir',
-			                   name: 'RÚV',			        
-			                   shortName: 'ruv'
-			                 },
-			                 { feedURL: 'https://www.mbl.is/feeds/nyjast/',
-			                   name: 'Morgunblaðið',			        
-			                   shortName: 'mbl'
-			                 },
-			                 { feedURL: 'http://www.visir.is/rss/allt',
-			                   name: 'Vísir',			        
-			                   shortName: 'visir'
-			                 },
-			                 { feedURL: 'https://stundin.is/rss/',
-			                   name: 'Stundin',			        
-			                   shortName: 'stundin'
-			                 },
-			                 { feedURL: 'http://www.dv.is/feed/',
-			                   name: 'DV',			        
-			                   shortName: 'dv'
-			                 }];		
-			var outputString = 'Hér eru nýjustu fréttir:'
-			console.log('Interpretation: Get news');
+			// Check if specific provider is requested
+			if(input.match(/(RÚV|Ríkisútvarp)/i)) {
+				// RÚV
+				var providers = [{ feedURL: 'http://www.ruv.is/rss/frettir',
+				                   name: 'RÚV',			        
+				                   shortName: 'ruv'
+				                 }];		
+				var outputString = 'Hér eru nýjustu fréttirnar frá RÚV:'	
+				console.log('Interpretation: Get news from RÚV');
+			} else if(input.match(/(Morgunblað|mbl|Mogganum)/i)) {
+				// Morgunblaðið
+				var providers = [{ feedURL: 'https://www.mbl.is/feeds/nyjast/',
+				                   name: 'Morgunblaðið',			        
+				                   shortName: 'mbl'
+				                 }];		
+				var outputString = 'Hér eru nýjustu fréttirnar frá Morgunblaðinu:'	
+				console.log('Interpretation: Get news from Morgunblaðið');
+			} else if(input.match(/(Vísi|Fréttablað)/i)) {
+				// Vísir
+				var providers = [{ feedURL: 'http://www.visir.is/rss/allt',
+				                   name: 'Vísir',			        
+				                   shortName: 'visir'
+				                 }];		
+				var outputString = 'Hér eru nýjustu fréttirnar frá Vísi:'	
+				console.log('Interpretation: Get news from Vísir');
+			} else if(input.match(/(Stundin)/i)) {
+				// Stundin
+				var providers = [{ feedURL: 'https://stundin.is/rss/',
+				                   name: 'Stundin',			        
+				                   shortName: 'stundin'
+				                 }];		
+				var outputString = 'Hér eru nýjustu fréttirnar frá Stundinni:'	
+				console.log('Interpretation: Get news from Stundin');
+			} else if(input.match(/(DV)/i)) {
+				// DV
+				var providers = [{ feedURL: 'http://www.dv.is/feed/',
+				                   name: 'DV',			        
+				                   shortName: 'dv'
+				                 }];		
+				var outputString = 'Hér eru nýjustu fréttirnar frá DV:'	
+				console.log('Interpretation: Get news from DV');
+			} else {
+				// General news
+				var providers = [{ feedURL: 'http://www.ruv.is/rss/frettir',
+				                   name: 'RÚV',			        
+				                   shortName: 'ruv'
+				                 },
+				                 { feedURL: 'https://www.mbl.is/feeds/nyjast/',
+				                   name: 'Morgunblaðið',			        
+				                   shortName: 'mbl'
+				                 },
+				                 { feedURL: 'http://www.visir.is/rss/allt',
+				                   name: 'Vísir',			        
+				                   shortName: 'visir'
+				                 },
+				                 { feedURL: 'https://stundin.is/rss/',
+				                   name: 'Stundin',			        
+				                   shortName: 'stundin'
+				                 },
+				                 { feedURL: 'http://www.dv.is/feed/',
+				                   name: 'DV',			        
+				                   shortName: 'dv'
+				                 }];		
+				var outputString = 'Hér eru nýjustu fréttir:'	
+				console.log('Interpretation: Get news');			
+			}
 		}
 		
 		var limit = providers.length;
 		var i;
 		
 		var promises = [];
-		var $newsFeed = [];
+		var $newsFeed = { providerCount: providers.length, stories: [] };
 				
 		for(i=0; i<limit; i++) {
 			
@@ -98,7 +141,7 @@ function respondNews(input) {
 					i = this.ajaxI;
 									
 			        $(response.query.results.item).each(function(index, value) {
-				        if(index>3) { 
+				        if(index>4) { 
 					        return false;
 					    } else {
 						    var thisStory = {
@@ -109,7 +152,7 @@ function respondNews(input) {
 							    title: value.title,
 							    description: cleanHTML(value.description).substring(0,100)
 						    };
-						    $newsFeed.push(thisStory);
+						    $newsFeed.stories.push(thisStory);
 				        }
 				    });
 			        console.log('Loaded news from '+providers[i].name+'.');	 					
@@ -125,16 +168,37 @@ function respondNews(input) {
 		
 		$.when.apply(null, promises).done(function() {
 			
-		   $newsFeed = sortByKey($newsFeed, 'pubDate', true);					
+		   $newsFeed.stories = sortByKey($newsFeed.stories, 'pubDate', true);	
+		   
+		   console.log($newsFeed);
+		   				
 		   var newsOutput = '<div class="card news">';
 		   
-		   for(i=0; i<5; i++) {
-			    newsOutput += '<div class="row">';
-		        newsOutput += '<div class="provider"><img src="images/provider_'+$newsFeed[i].providerShortName+'.svg" alt="'+$newsFeed[i].providerName+'" />';
-		        newsOutput += '<p class="date">'+moment($newsFeed[i].pubDate).fromNow()+'</p></div>';
-		        newsOutput += '<p class="headline"><a href="'+$newsFeed[i].link+'" target="_new">'+$newsFeed[i].title+'</a></p>';
-		        newsOutput += '<p class="description">'+$newsFeed[i].description+'…</p>';
-		        newsOutput += '</div>';
+		   if($newsFeed.providerCount>1) {
+		   
+			   for(i=0; i<5; i++) {
+				    newsOutput += '<div class="row">';
+			        newsOutput += '<div class="provider"><img src="images/provider_'+$newsFeed.stories[i].providerShortName+'.svg" alt="'+$newsFeed.stories[i].providerName+'" />';
+			        newsOutput += '<p class="date">'+moment($newsFeed.stories[i].pubDate).fromNow()+'</p></div>';
+			        newsOutput += '<p class="headline"><a href="'+$newsFeed.stories[i].link+'" target="_new">'+$newsFeed.stories[i].title+'</a></p>';
+			        newsOutput += '<p class="description">'+$newsFeed.stories[i].description+'…</p>';
+			        newsOutput += '</div>';
+			   }
+		   
+		   } else {
+			   
+			   	newsOutput += '<img class="provider" src="images/provider_'+$newsFeed.stories[0].providerShortName+'.svg" />'
+			   
+			    for(i=0; i<5; i++) {
+				    newsOutput += '<div class="row">';
+			        newsOutput += '<div class="provider">';
+			        newsOutput += '<p class="date">'+moment($newsFeed.stories[i].pubDate).fromNow()+'</p></div>';
+			        newsOutput += '<p class="headline"><a href="'+$newsFeed.stories[i].link+'" target="_new">'+$newsFeed.stories[i].title+'</a></p>';
+			        newsOutput += '<p class="description">'+$newsFeed.stories[i].description+'…</p>';
+			        newsOutput += '</div>';
+			   }
+
+			   
 		   }
 		   			
 		   newsOutput += '</div>';		   

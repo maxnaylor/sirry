@@ -755,6 +755,11 @@
 	padding: 5px 10px;	
 }
 
+.card img.provider {
+	height: 24px;
+	margin: 10px 0 0 0;
+}
+
 .card.news .row {
 	float: left;
 	width: 100%;	
@@ -783,6 +788,7 @@
 .card.news .row .provider img {
 	float: left;
 	height: 16px;
+	margin: 0 10px 0 0;
 }
 
 .card.news .row .headline {
@@ -798,7 +804,7 @@
 .card.news .row .date {
 	float: left;
 	font-size: 13px;
-	padding: 2px 10px;
+	padding: 2px 0;
 	font-weight: normal;
 	color: #ccc;
 }

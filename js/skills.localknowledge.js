@@ -18,36 +18,53 @@ function respondTV(input) {
 			success: function(response) {					    
 				loadingComplete();
 			    var $schedule = '';
-			    $.each(response, function(i1, v1) {	
-				    $schedule = $schedule+'<div class="card tvguide"><img class="provider" src="images/provider_'+channel.shortname+'.svg"><table>';	
-				    var row = 1;	    
-					$.each(v1, function(i2, v2) {	
-						var startTime = moment(v2.startTime);
-						if(row<5) {
-							if(startTime>Date.now()) {	
-								$schedule = $schedule+'<tr><td class="time">'+moment(startTime).format('LT')+'</td>'    
-								$schedule = $schedule+'<td>'+v2.title;
-								if(v2.originalTitle) {
-									$schedule = $schedule+'<span>'+v2.originalTitle+'</span>';
+			    
+			    if(response.results.length>0) {
+				    
+				    $.each(response, function(i1, v1) {	
+					    $schedule = $schedule+'<div class="card tvguide"><img class="provider" src="images/provider_'+channel.shortname+'.svg" /><table>';	
+					    var row = 1;	    
+						$.each(v1, function(i2, v2) {	
+							var startTime = moment(v2.startTime);
+							if(row<5) {
+								if(startTime>Date.now()) {	
+									$schedule = $schedule+'<tr><td class="time">'+moment(startTime).format('LT')+'</td>'    
+									$schedule = $schedule+'<td>'+v2.title;
+									if(v2.originalTitle) {
+										$schedule = $schedule+'<span>'+v2.originalTitle+'</span>';
+									}
+									$schedule = $schedule+'</td></tr>';
+									row++;
 								}
-								$schedule = $schedule+'</td></tr>';
-								row++;
 							}
+					    });
+						$schedule = $schedule+'</table>';
+						if(row>4) {
+							$schedule = $schedule+'<a class="moreinfo" href="'+channel.url+'">Nánar…</a>';
 						}
+					    $schedule = $schedule+'</div>';
 				    });
-					$schedule = $schedule+'</table>';
-					if(row>4) {
-						$schedule = $schedule+'<a class="moreinfo" href="'+channel.url+'">Nánar…</a>';
-					}
-				    $schedule = $schedule+'</div>';
-			    });
-				appendOutput({ output: 'Þetta er dagskráin á '+channel.name+' í dag:<br />',
-							   outputData: $schedule, 
-					           outputPhrase: 'Þetta er dagskráin á '+channel.name+' í dag:' });
+				    
+				    var d = new Date();
+				    if(d.getHours()>17) {
+					    var timePhrase = 'í kvöld';
+				    } else {
+					    var timePhrase = 'í dag';
+				    }
+				    
+					appendOutput({ output: 'Þetta er dagskráin á '+channel.name+' '+timePhrase+':<br />',
+								   outputData: $schedule, 
+						           outputPhrase: 'Þetta er dagskráin á '+channel.name+' í dag:' });
+						           
+			    } else {
+				    
+				    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
+				    
+			    }				   
 			},
 			error: function(error) {		    
 			    loadingComplete();
-			    appendOutput({ output: 'Ég get sótt þessar upplýsingar í augnablikinu.' });
+			    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
 		    }
 		});
 		return true;

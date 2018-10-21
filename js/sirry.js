@@ -264,7 +264,7 @@ function cleanInput(input) {
 	input   = input.replace(/^(og|en)/, '');	
 	input   = scrubInput(input);
 	if(input.match(/^(hvað er |hvað eru )/i)) {		
-		if(!input.match(/(klukkan|ég|gömul|gamall|á ensku|í sjónvarpi|í sjónvarpinu|nýtt|helst|að frétta|\+|\–|\-|×|÷)/gi)) {
+		if(!input.match(/(klukkan|ég|gömul|gamall|á ensku|í sjónvarpi|nýtt|helst|að frétta|á döfinni|\+|\–|\-|×|÷)/gi)) {
 			console.log('Parsed “what is” question');
 			var searchQuery  = input.replace(/(hvað\ er\ |hvað\ eru\ )/gi, '');	
 			var questionVerb = input.split(' ');
