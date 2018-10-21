@@ -7,7 +7,7 @@ mb_language('uni');
 mb_internal_encoding('UTF-8');
 ini_set('default_charset', 'utf-8');
 setlocale(LC_ALL, 'is_IS');
-error_reporting(0);	
+error_reporting(1);	
 
 // Database connection
 $user = 'root';

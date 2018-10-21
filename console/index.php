@@ -33,13 +33,14 @@ include_once 'bin/includes.php';
 					<th>Sent</th>
 				</tr>
 				<?php
-				$q = "SELECT * FROM `queries`
-				     ORDER BY `sent` DESC
+				$q = "SELECT * FROM queries				
+				     JOIN responses ON queries.q_response = responses.r_id
+				     ORDER BY queries.q_sent DESC
 				     LIMIT 0, 50";
 				$r = mysqli_query($link, $q);
-				if($r) {
+				if($r && mysqli_num_rows($r)>0) {
 					while($row = mysqli_fetch_array($r)) {
-						switch ($row['source']) {
+						switch ($row['q_source']) {
 							case '0':
 								$source = 'Óþekkt';
 								break;
@@ -51,13 +52,13 @@ include_once 'bin/includes.php';
 								break;
 						} 
 						?>
-						<tr<?php if($row['unknownInput']) { echo ' class="red"'; }; ?>>
-							<td><?php echo $row['id']; ?></td>
+						<tr<?php if($row['q_unknownInput']) { echo ' class="red"'; }; ?>>
+							<td><?php echo $row['q_id']; ?></td>
 							<td><?php echo $source; ?></td>
-							<td><?php echo $row['text']; ?></td>
-							<td><?php echo $row['response']; ?></td>
-							<td><?php echo $row['ip']; ?></td>
-							<td><?php echo strftime('%a. %e. %b %Y kl. %H:%M:%S', strtotime($row['sent'])); ?></td>
+							<td><?php echo $row['q_text']; ?></td>
+							<td><?php echo $row['r_text']; ?></td>
+							<td><?php echo $row['q_ip']; ?></td>
+							<td><?php echo strftime('%a. %e. %b %Y kl. %H:%M:%S', strtotime($row['q_sent'])); ?></td>
 						</tr>
 						<?php
 					}

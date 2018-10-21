@@ -41,7 +41,8 @@ function respondTV(input) {
 					}
 				    $schedule = $schedule+'</div>';
 			    });
-				appendOutput({ output: 'Þetta er dagskráin á '+channel.name+' í dag:<br />'+$schedule, 
+				appendOutput({ output: 'Þetta er dagskráin á '+channel.name+' í dag:<br />',
+							   outputData: $schedule, 
 					           outputPhrase: 'Þetta er dagskráin á '+channel.name+' í dag:' });
 			},
 			error: function(error) {		    

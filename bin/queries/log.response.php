@@ -8,7 +8,7 @@ $lastQuery    = mysqli_real_escape_string($link, $_POST['lastQuery']);
 $unknownInput = mysqli_real_escape_string($link, $_POST['unknownInput']);
 
 // Log response in database
-$q = "INSERT INTO `responses` (source,text,sent) 
+$q = "INSERT INTO `responses` (r_source,r_text,r_sent) 
       VALUES ('{$source}','{$text}',NOW())";
 
 // Execute query
@@ -21,8 +21,8 @@ if(mysqli_query($link, $q) === TRUE) {
 if($lastQuery) {	
 	// Link response with query
 	$q = "UPDATE `queries`
-	      SET response = '{$id}', unknownInput = '{$unknownInput}'
-          WHERE id = '{$lastQuery}'";
+	      SET q_response = '{$id}', q_unknownInput = '{$unknownInput}'
+          WHERE q_id = '{$lastQuery}'";
     // Execute query
 	if(mysqli_query($link, $q) === TRUE) {
 		echo 'success';

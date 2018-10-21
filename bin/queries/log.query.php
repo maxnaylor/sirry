@@ -8,7 +8,7 @@ $unknownInput = mysqli_real_escape_string($link, $_POST['unknownInput']);
 $ip           = $_SERVER['REMOTE_ADDR'];
 
 // Log query in database
-$q = "INSERT INTO `queries` (source,text,unknownInput,ip,sent) 
+$q = "INSERT INTO `queries` (q_source,q_text,q_unknownInput,q_ip,q_sent) 
       VALUES ('{$source}','{$text}','{$unknownInput}','{$ip}',NOW())";
 
 // Execute query

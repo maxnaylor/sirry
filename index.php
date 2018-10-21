@@ -59,7 +59,7 @@ require_once 'bin/includes.php';
 		<h1>Fréttir</h1>
 		<ul>
 			<li><a>„Hvað er helst í fréttum?“</a></li>
-			<li><a>„Hvað að frétta erlendis?“</a></li>
+			<li><a>„Hvað er að frétta erlendis?“</a></li>
 			<li><a>„Sýndu mér nýjustu íþróttafréttir.“</a></li>
 		</ul>
 		<h1>Veður</h1>
