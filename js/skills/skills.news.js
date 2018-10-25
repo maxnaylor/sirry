@@ -1,10 +1,11 @@
 // Skills - News
 
 function respondNews(input) {
+	var analysis = analyseIntent(input);
 	var response = '';
-	if(input.match(/(hvað er|sýndu)? ?(nýtt|helst)? ?(að frétta|frétt|á döfinni)/i)) {
+	if(analysis.intent=='getNews') {
 		respondLoading();	
-		if(input.match(/(hérlendis|innlendar|Ísland)/i)) {
+		if(analysis.subIntent=='icelandic') {
 			// Icelandic news
 			var providers = [{ feedURL: 'http://www.ruv.is/rss/innlent',
 			                   name: 'RÚV',			        
@@ -18,7 +19,7 @@ function respondNews(input) {
 			                 }];
 			var outputString = 'Hér eru nýjustu innlendar fréttir:'
 			console.log('Interpretation: Get Icelandic news');
-		} else if(input.match(/(erlendis|erlendar)/i)) {
+		} else if(analysis.subIntent=='foreign') {
 			// Foreign news
 			var providers = [{ feedURL: 'http://www.ruv.is/rss/erlent',
 			                   name: 'RÚV',			        
@@ -32,7 +33,7 @@ function respondNews(input) {
 			                 }];
 			var outputString = 'Hér eru nýjustu erlendar fréttir:'
 			console.log('Interpretation: Get foreign news');
-		} else if(input.match(/(íþrótt)/i)) {
+		} else if(analysis.subIntent=='sport') {
 			// Sport news
 			var providers = [{ feedURL: 'http://www.ruv.is/rss/ithrottir',
 			                   name: 'RÚV',			        
@@ -48,7 +49,7 @@ function respondNews(input) {
 			console.log('Interpretation: Get sport news');
 		} else {
 			// Check if specific provider is requested
-			if(input.match(/(RÚV|Ríkisútvarp)/i)) {
+			if(analysis.provider=='ruv') {
 				// RÚV
 				var providers = [{ feedURL: 'http://www.ruv.is/rss/frettir',
 				                   name: 'RÚV',			        
@@ -56,7 +57,7 @@ function respondNews(input) {
 				                 }];		
 				var outputString = 'Hér eru nýjustu fréttirnar frá RÚV:'	
 				console.log('Interpretation: Get news from RÚV');
-			} else if(input.match(/(Morgunblað|mbl|Mogganum)/i)) {
+			} else if(analysis.provider=='mbl') {
 				// Morgunblaðið
 				var providers = [{ feedURL: 'https://www.mbl.is/feeds/nyjast/',
 				                   name: 'Morgunblaðið',			        
@@ -64,7 +65,7 @@ function respondNews(input) {
 				                 }];		
 				var outputString = 'Hér eru nýjustu fréttirnar frá Morgunblaðinu:'	
 				console.log('Interpretation: Get news from Morgunblaðið');
-			} else if(input.match(/(Vísi|Fréttablað)/i)) {
+			} else if(analysis.provider=='visir') {
 				// Vísir
 				var providers = [{ feedURL: 'http://www.visir.is/rss/allt',
 				                   name: 'Vísir',			        
@@ -72,7 +73,7 @@ function respondNews(input) {
 				                 }];		
 				var outputString = 'Hér eru nýjustu fréttirnar frá Vísi:'	
 				console.log('Interpretation: Get news from Vísir');
-			} else if(input.match(/(Stundin)/i)) {
+			} else if(analysis.provider=='stundin') {
 				// Stundin
 				var providers = [{ feedURL: 'https://stundin.is/rss/',
 				                   name: 'Stundin',			        
@@ -80,7 +81,7 @@ function respondNews(input) {
 				                 }];		
 				var outputString = 'Hér eru nýjustu fréttirnar frá Stundinni:'	
 				console.log('Interpretation: Get news from Stundin');
-			} else if(input.match(/(DV)/i)) {
+			} else if(analysis.provider=='dv') {
 				// DV
 				var providers = [{ feedURL: 'http://www.dv.is/feed/',
 				                   name: 'DV',			        
@@ -88,6 +89,22 @@ function respondNews(input) {
 				                 }];		
 				var outputString = 'Hér eru nýjustu fréttirnar frá DV:'	
 				console.log('Interpretation: Get news from DV');
+			} else if(analysis.provider=='kjarninn') {
+				// Eyjan
+				var providers = [{ name: 'Kjarninn',			        
+				                   shortName: 'kjarninn'
+				                 }];		
+				loadingComplete();
+				appendOutput({ output: 'Ég get því miður ekki sótt fréttir frá Kjarnanum enn sem komið er.' });
+				console.log('Interpretation: Get news from Kjarninn (not available)');
+			} else if(analysis.provider=='eyjan') {
+				// Eyjan
+				var providers = [{ name: 'Eyjan',			        
+				                   shortName: 'eyjan'
+				                 }];		
+				loadingComplete();
+				appendOutput({ output: 'Ég get því miður ekki sótt fréttir frá Eyjunni enn sem komið er.' });
+				console.log('Interpretation: Get news from Eyjan (not available)');
 			} else {
 				// General news
 				var providers = [{ feedURL: 'http://www.ruv.is/rss/frettir',
@@ -118,97 +135,100 @@ function respondNews(input) {
 		var limit = providers.length;
 		var i;
 		
-		var promises = [];
-		var $newsFeed = { providerCount: providers.length, stories: [] };
+		if(providers[0].feedURL) {
+		
+			var promises = [];
+			var $newsFeed = { providerCount: providers.length, stories: [] };
+					
+			for(i=0; i<limit; i++) {
 				
-		for(i=0; i<limit; i++) {
+				console.log('Retrieving news from '+providers[i].name+'…');
 			
-			console.log('Retrieving news from '+providers[i].name+'…');
-		
-			var yql = URL = [
-		        'https://query.yahooapis.com/v1/public/yql',
-		        '?q=' + encodeURIComponent("select title, description, category, link, pubDate from rss where  url='"+providers[i].feedURL+ "'"),
-		        '&format=json&callback=?'
-		    ].join('');	
-		    
-			var request = $.ajax({
-				dataType: 'jsonp',
-				url: yql,
-				type: 'GET',
-				ajaxI: i,
-				success: function(response) {
-					
-					i = this.ajaxI;
-									
-			        $(response.query.results.item).each(function(index, value) {
-				        if(index>4) { 
-					        return false;
-					    } else {
-						    var thisStory = {
-							    providerShortName: providers[i].shortName,
-							    providerName: providers[i].name,
-							    pubDate: value.pubDate,
-							    link: value.link,
-							    title: value.title,
-							    description: cleanHTML(value.description).substring(0,100)
-						    };
-						    $newsFeed.stories.push(thisStory);
-				        }
-				    });
-			        console.log('Loaded news from '+providers[i].name+'.');	 					
-					
-				}, error: function() {
-					console.log('Unable to load news from '+providers[i].name+'.');	 
-				}
-			});			
+				var yql = URL = [
+			        'https://query.yahooapis.com/v1/public/yql',
+			        '?q=' + encodeURIComponent("select title, description, category, link, pubDate from rss where  url='"+providers[i].feedURL+ "'"),
+			        '&format=json&callback=?'
+			    ].join('');	
+			    
+				var request = $.ajax({
+					dataType: 'jsonp',
+					url: yql,
+					type: 'GET',
+					ajaxI: i,
+					success: function(response) {
+						
+						i = this.ajaxI;
+										
+				        $(response.query.results.item).each(function(index, value) {
+					        if(index>4) { 
+						        return false;
+						    } else {
+							    var thisStory = {
+								    providerShortName: providers[i].shortName,
+								    providerName: providers[i].name,
+								    pubDate: value.pubDate,
+								    link: value.link,
+								    title: value.title,
+								    description: cleanHTML(value.description).substring(0,100)
+							    };
+							    $newsFeed.stories.push(thisStory);
+					        }
+					    });
+				        console.log('Loaded news from '+providers[i].name+'.');	 					
+						
+					}, error: function() {
+						console.log('Unable to load news from '+providers[i].name+'.');	 
+					}
+				});			
+				
+				promises.push(request);
 			
-			promises.push(request);
-		
-		}	
-		
-		$.when.apply(null, promises).done(function() {
+			}	
 			
-		   $newsFeed.stories = sortByKey($newsFeed.stories, 'pubDate', true);	
-		   
-		   console.log($newsFeed);
-		   				
-		   var newsOutput = '<div class="card news">';
-		   
-		   if($newsFeed.providerCount>1) {
-		   
-			   for(i=0; i<5; i++) {
-				    newsOutput += '<div class="row">';
-			        newsOutput += '<div class="provider"><img src="images/provider_'+$newsFeed.stories[i].providerShortName+'.svg" alt="'+$newsFeed.stories[i].providerName+'" />';
-			        newsOutput += '<p class="date">'+moment($newsFeed.stories[i].pubDate).fromNow()+'</p></div>';
-			        newsOutput += '<p class="headline"><a href="'+$newsFeed.stories[i].link+'" target="_new">'+$newsFeed.stories[i].title+'</a></p>';
-			        newsOutput += '<p class="description">'+$newsFeed.stories[i].description+'…</p>';
-			        newsOutput += '</div>';
+			$.when.apply(null, promises).done(function() {
+				
+			   $newsFeed.stories = sortByKey($newsFeed.stories, 'pubDate', true);			   				
+			   				
+			   // Assemble stories
+			   var newsOutput = '<div class="card news">';
+			   
+			   if($newsFeed.providerCount>1) {
+			   
+				   for(i=0; i<5; i++) {
+					    newsOutput += '<div class="row">';
+				        newsOutput += '<div class="provider"><img src="images/provider_'+$newsFeed.stories[i].providerShortName+'.svg" alt="'+$newsFeed.stories[i].providerName+'" />';
+				        newsOutput += '<p class="date">'+moment($newsFeed.stories[i].pubDate).fromNow()+'</p></div>';
+				        newsOutput += '<p class="headline"><a href="'+$newsFeed.stories[i].link+'" target="_new">'+$newsFeed.stories[i].title+'</a></p>';
+				        newsOutput += '<p class="description">'+$newsFeed.stories[i].description+'…</p>';
+				        newsOutput += '</div>';
+				   }
+			   
+			   } else {
+				   
+				   	newsOutput += '<img class="provider" src="images/provider_'+$newsFeed.stories[0].providerShortName+'.svg" />'
+				   
+				    for(i=0; i<5; i++) {
+					    newsOutput += '<div class="row">';
+				        newsOutput += '<div class="provider">';
+				        newsOutput += '<p class="date">'+moment($newsFeed.stories[i].pubDate).fromNow()+'</p></div>';
+				        newsOutput += '<p class="headline"><a href="'+$newsFeed.stories[i].link+'" target="_new">'+$newsFeed.stories[i].title+'</a></p>';
+				        newsOutput += '<p class="description">'+$newsFeed.stories[i].description+'…</p>';
+				        newsOutput += '</div>';
+				   }
+	
 			   }
-		   
-		   } else {
+			   			
+			   newsOutput += '</div>';		 
+			     
+			   loadingComplete();	   
+			   appendOutput({
+			       output: outputString,
+				   outputData: newsOutput
+			   });
 			   
-			   	newsOutput += '<img class="provider" src="images/provider_'+$newsFeed.stories[0].providerShortName+'.svg" />'
-			   
-			    for(i=0; i<5; i++) {
-				    newsOutput += '<div class="row">';
-			        newsOutput += '<div class="provider">';
-			        newsOutput += '<p class="date">'+moment($newsFeed.stories[i].pubDate).fromNow()+'</p></div>';
-			        newsOutput += '<p class="headline"><a href="'+$newsFeed.stories[i].link+'" target="_new">'+$newsFeed.stories[i].title+'</a></p>';
-			        newsOutput += '<p class="description">'+$newsFeed.stories[i].description+'…</p>';
-			        newsOutput += '</div>';
-			   }
-
-			   
-		   }
-		   			
-		   newsOutput += '</div>';		   
-		   loadingComplete();	   
-		   appendOutput({
-		       output: outputString,
-			   outputData: newsOutput
-		   });
-		   
-		});
+			});
+		
+		}
 		
 		return true;
 	}

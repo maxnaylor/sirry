@@ -1,9 +1,10 @@
 // Skills — Lookup
 
 function respondWhatIs(input) {
+	var analysis = analyseIntent(input);
 	var respondWhatIsResponse = '';
-	if(input.match(/^(hvað er |hvað eru |hver er )/i) && !input.match(/(ég|gömul|gamall|á ensku|kennitala)/gi)) {
-		var searchQuery = input.replace(/^(hvað er |hvað eru |hver er )/gi, '');
+	if(analysis.intent=='whatIs') {
+		var searchQuery = analysis.searchItem;
 			searchQuery = cleanProperNouns(searchQuery);
 		    searchQuery = encodeURI(searchQuery);
 		console.log('Interpretation: What is “'+searchQuery+'”');
@@ -185,7 +186,29 @@ function decline(word,gramCase) {
 			word = declinedWord[0].nom; 			
 		} else {
 			console.log('Word “'+word+'” not found in database');
-			return false;
+			return word;
+		}
+	}
+	if(gramCase=='acc') {
+		var declinedWord = $.grep(countryDeclensions, function(e) { 
+			return e.nom === word;	
+		});		
+		if(declinedWord[0]) { 
+			word = declinedWord[0].acc; 			
+		} else {
+			console.log('Word “'+word+'” not found in database');
+			return word;
+		}
+	}
+	if(gramCase=='dat') {
+		var declinedWord = $.grep(countryDeclensions, function(e) { 
+			return e.nom === word;	
+		});		
+		if(declinedWord[0]) { 
+			word = declinedWord[0].dat; 			
+		} else {
+			console.log('Word “'+word+'” not found in database');
+			return word;
 		}
 	}
 	if(gramCase=='gen') {
@@ -196,7 +219,7 @@ function decline(word,gramCase) {
 			word = declinedWord[0].gen; 			
 		} else {
 			console.log('Word “'+word+'” not found in database');
-			return false;
+			return word;
 		}
 	}
 	return word;

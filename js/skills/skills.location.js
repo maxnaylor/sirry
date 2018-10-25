@@ -2,21 +2,20 @@
 
 
 function respondLocation(input) {
+	var analysis = analyseIntent(input);
 	var respondLocationResponse = '';
-	if(input.match(/(hvar er|týnd)/gi) && !input.match(/(bensín)/gi)) {
+	if(analysis.intent=='whereIs') {
 		respondLoading();
-		if(input.match(/(ég)/gi)) {
-			loadingComplete();
-			var location = getLocation();
-			return true;
-		} else {
-			loadingComplete();
-			var searchQuery = input.replace(/(hvar er)/gi, '');			
-				searchQuery = searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1);
-			appendOutput({ output: scrubInput(searchQuery)+' er hér:',
-				           outputData: '<br /><div class="map"><iframe width="100%" height="100%" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key='+$googleMapsKey+'&language=is-is&q='+searchQuery+'"></iframe></div>' });
-			return true;
-		}
+		loadingComplete();
+		var searchQuery = analysis.searchItem;		
+			searchQuery = searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1);
+		appendOutput({ output: scrubInput(searchQuery)+' er hér:',
+			           outputData: '<br /><div class="map"><iframe width="100%" height="100%" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key='+$googleMapsKey+'&language=is-is&q='+searchQuery+'"></iframe></div>' });
+		return true;
+	} else if(analysis.intent=='whereAmI') {
+		loadingComplete();
+		var location = getLocation();
+		return true;
 	} else if(input.match(/(hvar bý ég|hvar á ég heima)/gi)) {
 		userInfoAddressWithPrep = $.cookie('userInfoAddressWithPrep');
 		if(userInfoAddressWithPrep) {

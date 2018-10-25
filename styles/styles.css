@@ -48,6 +48,13 @@
 	}			
 }
 
+@media (prefers-color-scheme: dark) {
+	#textbox {	
+		background: #333;
+		box-shadow: 0 -1px 5px rgba(0,0,0,0.2);
+	}
+}
+
 #textbox .input {
 	margin: 0 0 1px 0;
 	border: none;
@@ -58,6 +65,18 @@
 	outline: none;
 	border-radius: 0;
 	-webkit-appearance: none;
+}
+
+@media (prefers-color-scheme: dark) {
+	#textbox .input {	
+		border-bottom: 1px solid #666;
+		background: #333;
+		color: #fff;
+	}
+	
+	#textbox .input::placeholder {
+		color: #666;
+	}
 }
 
 #textbox .input:focus {
@@ -101,6 +120,13 @@
 	padding: 10px 15px;
 	margin: 5px 0;
 	max-width: 390px;
+}
+
+@media (prefers-color-scheme: dark) {
+	#output .bubble {
+		background: #666;
+		color: #fff;
+	}
 }
 
 #output .bubble.input {
@@ -171,6 +197,12 @@
 	.card {			
 		width: 285px;
 	}			
+}
+
+@media (prefers-color-scheme: dark) {
+	.card {	
+		background: #333;
+	}
 }
 
 .card .row {
@@ -894,6 +926,13 @@
 	z-index: 100;
 }
 
+@media (prefers-color-scheme: dark) {
+	#speech {
+		background-color: #333;
+		color: #fff;
+	}
+}
+
 #speech.disabled {
 	cursor: default;
 	background-image: url('../images/speech_off.svg');
@@ -933,6 +972,14 @@
 	z-index: 1000;
 }
 
+@media (prefers-color-scheme: dark) {
+	#notification {
+		color: #fff;
+		background: #333;
+		box-shadow: 0 0 1px rgba(0,0,0,0.2), 0 2px 5px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.2);
+	}
+}
+
 #notification.visible {
 	display: block;
 }
@@ -958,6 +1005,14 @@
 		bottom: auto;
 		position: absolute;
 	}			
+}
+
+@media (prefers-color-scheme: dark) {
+	#onboarding, 
+	#cookieWarning {
+		color: #fff;
+		background: #333;
+	}
 }
 
 #onboarding h1,
@@ -1038,12 +1093,19 @@
 
 #helpcommands .close {
 	position: absolute;
-	background: #ffffff;
+	background: #fff;
 	top: 0;	
 	width: 280px;
 	padding: 20px;
 	box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 	pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+	#helpcommands .close {
+		background: #333;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	}
 }
 
 #helpcommands .close:hover {
@@ -1064,6 +1126,12 @@
 	z-index: 10000;
 }
 
+@media (prefers-color-scheme: dark) {
+	#helpcommands {
+		background: #333;
+	}
+}
+
 #helpcommands.visible {
 	left: 0;
 }
@@ -1081,6 +1149,14 @@
 	border-top: 1px solid #efefef;
 	border-bottom: 1px solid #efefef;
 	font-weight: normal;
+}
+
+@media (prefers-color-scheme: dark) {
+	#helpcommands h1 {
+		color: #fff;
+		border-top: 1px solid #666;
+		border-bottom: 1px solid #666;
+	}
 }
 
 #helpcommands h1.sticky {

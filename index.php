@@ -23,7 +23,7 @@ require_once 'bin/includes.php';
 	</div>
 	<div id="onboarding">
 		<h1>Velkomin!</h1>
-		<p class="blurb">Ég heiti Sirrý og ég er snjall stafrænn aðstoðarmaður sem talar og skilur íslensku. Þú getur spurt mig spurninga og gefið mig skipanir eins og:</p>
+		<p class="blurb">Ég heiti Sirrý og ég er snjall stafrænn aðstoðarmaður sem talar og skilur íslensku. Þú getur spurt mig spurninga og gefið mér skipanir eins og:</p>
 		<table>
 			<tr>
 				<td>„Hvar er ég?“</td>

@@ -170,44 +170,50 @@ var $unknownInput = false;
 
 function parseInput() {	
 	var input = $('#input').val();
-	input = input.replace(/[.?]$/g,'');
+	input = correctSpelling(input);
+	input = input.replace(/[.?]$/g,'');	
 	if(input) {
-		appendInput(input);		
-		input = input.replace(/^(en |og )/i,'');
-		var response = '';
-		// Passive responses
-		response = respondGreeting(input);
-		if(!response) { response = respondGoodBye(input); }
-		if(!response) { response = respondHowAreYou(input); }
-		if(!response) { response = respondSmallTalk(input); }
-		if(!response) { response = respondThanks(input); }
-		if(!response) { response = respondAmI(input); }
-		if(!response) { response = respondIntroductions(input); }
-		if(!response) { response = respondSwearWords(input); }
-		if(!response) { response = respondTime(input); }
-		if(!response) { response = respondStopwatch(input); }
-		if(!response) { response = respondCountdown(input); }
-		if(!response) { response = respondRandomNumber(input); }
-		// Active responses
-		if(!response) { response = respondArithmetic(input); }
-		if(!response) { response = respondTV(input); }
-		if(!response) { response = respondCompanyLookup(input); }
-		if(!response) { response = respondNews(input); }
-		if(!response) { response = respondWhatIs(input); }
-		if(!response) { response = respondWhatHappened(input); }
-		if(!response) { response = respondBio(input); }
-		if(!response) { response = respondIAm(input); }
-		if(!response) { response = respondLocation(input); }
-		if(!response) { response = respondNorthernLights(input); }
-		if(!response) { response = respondAvalancheWarning(input); }
-		if(!response) { response = respondWeather(input); }		
-		if(!response) { response = respondCurrencyConversion(input); }	
-		if(!response) { response = respondBus(input); }	
-		if(!response) { response = respondTranslation(input); }
-		if(!response) { response = respondDeclension(input); }
-		if(!response) { response = respondPetrol(input); }
-		// Preferences
-		if(!response) { response = respondSetVoice(input); }
+		// Find intent
+		var analysis = analyseIntent(input);
+		console.log(analysis);
+		if(analysis) {
+			appendInput(input);		
+			input = input.replace(/^(en |og )/i,'');
+			var response = '';
+			// Passive responses
+			response = respondGreeting(input);
+			if(!response) { response = respondGoodBye(input); }
+			if(!response) { response = respondHowAreYou(input); }
+			if(!response) { response = respondSmallTalk(input); }
+			if(!response) { response = respondThanks(input); }
+			if(!response) { response = respondAmI(input); }
+			if(!response) { response = respondIntroductions(input); }
+			if(!response) { response = respondSwearWords(input); }
+			if(!response) { response = respondTime(input); }
+			if(!response) { response = respondStopwatch(input); }
+			if(!response) { response = respondCountdown(input); }
+			if(!response) { response = respondRandomNumber(input); }
+			// Active responses
+			if(!response) { response = respondArithmetic(input); }
+			if(!response) { response = respondTV(input); }
+			if(!response) { response = respondCompanyLookup(input); }
+			if(!response) { response = respondNews(input); }
+			if(!response) { response = respondWhatIs(input); }
+			if(!response) { response = respondWhatHappened(input); }
+			if(!response) { response = respondBio(input); }
+			if(!response) { response = respondIAm(input); }
+			if(!response) { response = respondLocation(input); }
+			if(!response) { response = respondNorthernLights(input); }
+			if(!response) { response = respondAvalancheWarning(input); }
+			if(!response) { response = respondWeather(input); }		
+			if(!response) { response = respondCurrencyConversion(input); }	
+			if(!response) { response = respondBus(input); }	
+			if(!response) { response = respondTranslation(input); }
+			if(!response) { response = respondDeclension(input); }
+			if(!response) { response = respondPetrol(input); }
+			// Preferences
+			if(!response) { response = respondSetVoice(input); }
+		}
 		// Unknown response 
 		if(!response) {
 			response = respondUnknown();
@@ -239,7 +245,7 @@ function cleanProperNouns(input) {
 			console.log('“'+value+'” converted to uppercase');
 			value = value.charAt(0).toUpperCase() + value.slice(1);	
 		} else {
-			console.log('“'+value+'” not converted to uppercase');
+			//console.log('“'+value+'” not converted to uppercase');
 		}
 		input = input+value+' ';
 	});
@@ -258,57 +264,39 @@ function scrubInput(input) {
 }
 
 function cleanInput(input) {
-	input   = input.replace(/\seg\s/, 'ég');
+	var analysis = analyseIntent(input);
+	// Scrub string
 	testAnd = /^(og )/i.test(input);
 	testBut = /^(en )/i.test(input);
 	input   = input.replace(/^(og|en)/, '');	
 	input   = scrubInput(input);
-	if(input.match(/^(hvað er |hvað eru )/i)) {		
-		if(!input.match(/(klukkan|ég|gömul|gamall|á ensku|í sjónvarpi|nýtt|helst|að frétta|á döfinni|\+|\–|\-|×|÷)/gi)) {
-			console.log('Parsed “what is” question');
-			var searchQuery  = input.replace(/(hvað\ er\ |hvað\ eru\ )/gi, '');	
-			var questionVerb = input.split(' ');
-			if(input.match(/[0-9]\ ?(\+|\–|\-|×|÷)\ ?[0-9]/gi)) {
-				input = input.replace(' ', '');
-			}
-			input = 'hvað '+questionVerb[1]+' „'+searchQuery+'“?';
+	if(analysis.intent=='whatIs') {		
+		console.log('Parsed “what is” question');
+		var searchQuery  = analysis.searchItem;
+		var questionVerb = input.split(' ');
+		if(input.match(/^(hvað eru|hvað er)/i)) {			
+			input = 'hvað '+questionVerb[1]+' „'+analysis.searchItem+'“?';
+		} else if(input.match(/^(hver er)/i)) {			
+			input = 'hver '+questionVerb[1]+' '+analysis.searchItem+'?';
 		}
 	}
-	if(input.indexOf('hvað er') >= 0 && input.indexOf('á ensku') >= 0) {		
+	if(analysis.intent=='inEnglish') {		
 		console.log('Parsed “what is in English” question');
 		var searchQuery = input.replace('hvað er ', '');		
 		    searchQuery = searchQuery.replace(' á ensku', '');
 		input = 'hvað er „'+searchQuery+'“ á ensku?';
 	}
-	if(input.indexOf('hvar er ') >= 0 && !input.match(/(ég|bensín)/gi)) {				
+	if(analysis.intent=='whereIs') {				
 		console.log('Parsed “where is” question');	
-		var searchQuery = input.replace('hvar er ', '');
+		var searchQuery = analysis.searchItem;
 			searchQuery = searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1);		
 		input = 'hvar er '+searchQuery+'?';
 	}
-	if(input.match(/^(hvernig\ beygist\ )/i)) {					
+	if(analysis.intent=='declension') {					
 		console.log('Parsed “how to decline” question');
-		var searchQuery = input.replace('hvernig beygist', '');
+		var searchQuery = input.replace(/(hvernig beygist|hvernig beygi ég|hvernig beygirðu|hvernig beygiru|hvernig beygir maður)/gi, '');
 		    searchQuery = searchQuery.replace(' ', '');		
 		input = 'hvernig beygist „'+searchQuery+'“?';
-	}
-	if(input.indexOf('hvernig beygi ég') >= 0) {					
-		console.log('Parsed “how to decline” question');		
-		var searchQuery = input.replace('hvernig beygi ég', '');
-		    searchQuery = searchQuery.replace(' ', '');		
-		input = 'hvernig beygi ég „'+searchQuery+'“?';
-	}
-	if(input.indexOf('hvernig beygir maður') >= 0) {				
-		console.log('Parsed “how to decline” question');		
-		var searchQuery = input.replace('hvernig beygir maður', '');
-		    searchQuery = searchQuery.replace(' ', '');		
-		input = 'hvernig beygir maður „'+searchQuery+'“?';
-	}
-	if(input.indexOf('hvernig beygir þú') >= 0) {				
-		console.log('Parsed “how to decline” question');			
-		var searchQuery = input.replace('hvernig beygir þú', '');
-		    searchQuery = searchQuery.replace(' ', '');		
-		input = 'hvernig beygir þú „'+searchQuery+'“?';
 	}
 	if(testAnd) {
 		input = 'og '+input;
@@ -328,6 +316,19 @@ function cleanInput(input) {
 		}
 	}
 	input = input.charAt(0).toUpperCase() + input.slice(1);
+	return input;
+}
+
+function correctSpelling(input) {	
+	input = input.replace(/\beg\b/g, 'ég');
+	//input = input.replace(/\b(i)\b/g, 'í');
+	//input = input.replace(/\b(a)\b/g, 'á');
+	input = input.replace(/\b(ruv|rúv)\b/g, 'RÚV');
+	input = input.replace(/\b(stöð 2)\b/g, 'Stöð 2');
+	input = input.replace(/\b(skjáeinum)\b/g, 'SkjáEinum');
+	input = input.replace(/\b(morgunblaðinu)\b/g, 'Morgunblaðinu');
+	input = input.replace(/\b(mogganum)\b/g, 'Mogganum');
+	input = input.replace(/\b(dv)\b/g, 'DV');
 	return input;
 }
 

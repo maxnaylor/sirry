@@ -2,38 +2,62 @@
 
 
 function respondTime(input) {
-	var respondTimeResponse = '';
-	var time = new Date();
-	if(input.match(/(hvað er klukkan)/gi)) {
-		var time = ("0" + time.getHours()).slice(-2)+":"+("0" + time.getMinutes()).slice(-2);
-		respondTimeResponse = 'Klukkan er '+time+'.';
-	} else if(input.match(/(hvaða dagur er í dag)/gi)) {
-		var day   = time.getDay();
-		    day   = formatDay(day,true);
-		var date  = time.getDate();
-		var month = time.getMonth();
-		    month = formatMonth(month,true);
- 		respondTimeResponse = 'Í dag er '+day+' '+date+'. '+month+'.';
-	} else if(input.match(/(hvaða dagur verður á morgun)/gi)) {
-		var time  = new Date();
-		    time.setDate(time.getDate() + 1);
-		var day   = time.getDay();
-		    day   = formatDay(day,true);
-		var date  = time.getDate();
-		var month = time.getMonth();
-		    month = formatMonth(month,true);
- 		respondTimeResponse = 'Á morgun verður '+day+' '+date+'. '+month+'.';
-	} else if(input.match(/(hvaða dagur var í gær)/gi)) {
-		var time  = new Date();
-		    time.setDate(time.getDate() - 1);
-		var day   = time.getDay();
-		    day   = formatDay(day,true);
-		var date  = time.getDate();
-		var month = time.getMonth();
-		    month = formatMonth(month,true);
- 		respondTimeResponse = 'Í gær var '+day+' '+date+'. '+month+'.';
+	var analysis = analyseIntent(input);
+	var response = '';
+	if(analysis.intent=='currentTime') {
+		var time = moment().format('LT');
+		response = 'Klukkan er '+time+'.';
+	} else if(analysis.intent=='currentDay') {
+		var day = moment().format('dddd Do MMMM');
+ 		response = 'Í dag er '+day+'.';
+	} else if(analysis.intent=='previousDay') {		
+		var day = moment().add(1, 'days').format('dddd Do MMMM');
+ 		response = 'Á morgun verður '+day+'.';
+	} else if(analysis.intent=='nextDay') {
+		var day = moment().subtract(1, 'days').format('dddd Do MMMM');
+		response = 'Í gær var '+day+'.';
+	} else if(analysis.intent=='currentYear') {
+		var year = moment().format('YYYY');
+		response = 'Það er '+year+'.';
+	} else if(analysis.intent=='whichDayAgo') {
+		var daysAgo = input.replace(/\D/gi, '');
+		var day = moment().subtract(daysAgo, 'days').format('dddd Do MMMM');
+		response = 'Fyrir '+decline(formatSmallNumber(daysAgo), 'dat')+' dögum var '+day+'.';
+	} else if(analysis.intent=='whichYearAgo') {
+		var yearsAgo = input.replace(/\D/gi, '');
+		var year = moment().subtract(yearsAgo, 'years').format('YYYY');
+		response = 'Fyrir '+yearsAgo+' árum var árið '+year+'.';
 	}
-	return respondTimeResponse;
+	return response;
+}
+
+function formatSmallNumber(input) {
+	var number = input;
+	input = parseInt(input);
+	if(input==0) {
+		number = 'núll';
+	} else if(input==1) {
+		number = 'einn';
+	} else if(input==2) {
+		number = 'tveir';
+	} else if(input==3) {
+		number = 'þrír';
+	} else if(input==4) {
+		number = 'fjórir';
+	} else if(input==5) {
+		number = 'fimm';
+	} else if(input==6) {
+		number = 'sex';
+	} else if(input==7) {
+		number = 'sjö';
+	} else if(input==8) {
+		number = 'átta';
+	} else if(input==9) {
+		number = 'níu';
+	} else if(input==10) {
+		number = 'tíu';
+	}
+	return number
 }
 
 var seconds = 0, minutes = 0, hours = 0, t;
