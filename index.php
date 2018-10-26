@@ -33,7 +33,7 @@ require_once 'bin/includes.php';
 			<tr>
 				<td>„Hver er Katrín Jakobsdóttir?“</td>
 				<td>„Verða norðurljós í kvöld?“</td>
-				<td>„Settu tímamæli í gang.“</td>
+				<td>„Hvað er á Rás 2?“</td>
 			</tr>
 			<tr>
 				<td>„Hvað er rafbíll?“</td>
@@ -55,6 +55,7 @@ require_once 'bin/includes.php';
 		<ul>
 			<li><a>„Hvar er lægsta bensínverðið?“</a></li>
 			<li><a>„Hvað er í sjónvarpinu?“</a></li>
+			<li><a>„Hvað er á Rás 2?“</a></li>
 		</ul>
 		<h1>Fréttir</h1>
 		<ul>
@@ -85,7 +86,7 @@ require_once 'bin/includes.php';
 		<h1>Klukkan</h1>
 		<ul>
 			<li><a>„Hvað er klukkan?“</a></li>
-			<li><a>„Hvaða dagur er í dag?“</a></li>
+			<li><a>„Hvaða dagur var fyrir 10 dögum?“</a></li>
 			<li><a>„Settu tímamæli í gang.“</a></li>
 		</ul>
 		<h1>Stærðfræði</h1>

@@ -73,8 +73,9 @@ function showOnboarding() {
 }
 
 function hideOnboarding() {
-	$.cookie('onboarded',1);
+	$.cookie('onboarded', 1, { expires: 365 });
 	$('#onboarding').hide();
+	$('#input').focus();
 }
 
 
@@ -196,6 +197,7 @@ function parseInput() {
 			// Active responses
 			if(!response) { response = respondArithmetic(input); }
 			if(!response) { response = respondTV(input); }
+			if(!response) { response = respondRadio(input); }
 			if(!response) { response = respondCompanyLookup(input); }
 			if(!response) { response = respondNews(input); }
 			if(!response) { response = respondWhatIs(input); }
@@ -324,6 +326,8 @@ function correctSpelling(input) {
 	//input = input.replace(/\b(i)\b/g, 'í');
 	//input = input.replace(/\b(a)\b/g, 'á');
 	input = input.replace(/\b(ruv|rúv)\b/g, 'RÚV');
+	input = input.replace(/\b(rás 1)\b/g, 'Rás 1');
+	input = input.replace(/\b(rás 2)\b/g, 'Rás 2');
 	input = input.replace(/\b(stöð 2)\b/g, 'Stöð 2');
 	input = input.replace(/\b(skjáeinum)\b/g, 'SkjáEinum');
 	input = input.replace(/\b(morgunblaðinu)\b/g, 'Morgunblaðinu');

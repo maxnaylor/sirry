@@ -20,6 +20,12 @@ nav {
 	padding: 10px 0;
 }
 
+@media (prefers-color-scheme: dark) {
+	nav {
+		border-bottom: 1px solid #666;
+	}
+}
+
 nav img {
 	float: left;
 	width: 32px;
@@ -60,8 +66,20 @@ table th {
 	border-bottom: 2px solid #efefef;
 }
 
+@media (prefers-color-scheme: dark) {
+	table th {
+		border-bottom: 2px solid #666;
+	}
+}
+
 table td {
 	border-bottom: 1px solid #efefef;
+}
+
+@media (prefers-color-scheme: dark) {
+	table td {
+		border-bottom: 1px solid #666;
+	}
 }
 
 table td.empty {
@@ -74,5 +92,5 @@ table td.empty {
 
 table tr.red td {
 	color: #d90000;
-	background-color: #ffecec;
+	background-color: rgba(255, 0, 0, 0.1);
 }

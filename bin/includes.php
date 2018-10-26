@@ -25,7 +25,9 @@
 <script src="js/skills/skills.meta.js"></script>
 <script src="js/skills/skills.news.js"></script>
 <script src="js/skills/skills.personality.js"></script>
+<script src="js/skills/skills.radio.js"></script>
 <script src="js/skills/skills.transport.js"></script>
+<script src="js/skills/skills.tv.js"></script>
 <script src="js/skills/skills.weather.js"></script>
 <!--Mobile setup!-->
 <link rel="shortcut icon" href="images/favicon.png" />

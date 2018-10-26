@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
-include_once '../bin/library.php'; 
-include_once 'bin/includes.php'; 
+require_once '../bin/library.php'; 
+require_once 'bin/includes.php'; 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -19,7 +19,7 @@ include_once 'bin/includes.php';
 <body>	
 	<div class="container">
 		<nav>
-			<img src="../images/icon-256.png" />
+			<img src="../images/logo.svg" />
 			<h1><strong>Sirrý</strong>&nbsp;Atburðaskrá</h1>
 		</nav>
 		<section>

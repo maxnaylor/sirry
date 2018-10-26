@@ -3,25 +3,33 @@
 
 function respondGreeting(input) {
 	var respondGreetingResponse = '';
-	if(input.indexOf('góðan daginn') >= 0) {
+	if(input.match(/(^(daginn)$|(góðan (og blessaðan )?daginn))/i)) {
 		var respondGreetingResponseArray = [
 			'Góðan dag.',
 			'Góðan dag'+nameElement+'.'
 		];
 		var randomNumber = Math.floor(Math.random()*respondGreetingResponseArray.length);
 		respondGreetingResponse = respondGreetingResponseArray[randomNumber];
-	} else if(input.indexOf('góðan dag') >= 0) {
+	} else if(input.match(/(góðan (og blessaðan )?dag)/i)) {
 		var respondGreetingResponseArray = [
 			'Góðan daginn.',
 			'Góðan daginn'+nameElement+'.'
 		];
 		var randomNumber = Math.floor(Math.random()*respondGreetingResponseArray.length);
 		respondGreetingResponse = respondGreetingResponseArray[randomNumber];
-	} else if(input=='hæ') {
+	} else if(input.match(/(^(kvöldið)$|(gott kvöld|góða kvöldið))/i)) {
+		var respondGreetingResponseArray = [
+			'Góða kvöldið.',
+			'Gott kvöld.',
+			'Góðan daginn'+nameElement+'.'
+		];
+		var randomNumber = Math.floor(Math.random()*respondGreetingResponseArray.length);
+		respondGreetingResponse = respondGreetingResponseArray[randomNumber];
+	} else if(input.match(/(hæ( |$))/i)) {
 		respondGreetingResponse = 'Hæ.';
-	} else if(input.indexOf('halló') >= 0) {
+	} else if(input.match(/(hæ( |$))/i)) {
 		respondGreetingResponse = 'Halló.';
-	} else if(input.indexOf('sæl') >= 0) {
+	} else if(input.match(/(sæl( |$))/i)) {
 		respondGreetingResponse = 'Sæll.';
 	}
 	if(respondGreetingResponse) {
@@ -105,13 +113,13 @@ function respondSmallTalk(input) {
 		];
 		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
 		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
-	} else if(input.indexOf('ertu') >= 0 || input.indexOf('ert þú') >= 0) {
+	} else if(input.match(/^(ertu|ert þú)/i)) {
 		if(input.indexOf('þreytt') >= 0) {			
 			console.log('Interpretation: Are you tired?');
 			respondSmallTalkResponse = 'Ég þreytist aldrei.';
 		} else if(input.indexOf('svöng') >= 0 || input.indexOf('svangur') >= 0) {
 			console.log('Interpretation: Are you hungry?');
-			respondSmallTalkResponse = 'Ég neyta einskis nema rafmagns.';
+			respondSmallTalkResponse = 'Ég neyti einskis nema rafmagns.';
 		} else if(input.indexOf('viss') >= 0) {
 			console.log('Interpretation: Are you sure?');
 			respondSmallTalkResponse = 'Ég hef aldrei verið vissari.';
@@ -143,26 +151,26 @@ function respondSmallTalk(input) {
 			console.log('Interpretation: Where are you?');
 			respondSmallTalkResponse = 'Einhvers staðar í skýjunum, eða á ég að segja skýinu?';
 		}
-	} else if(input.indexOf('hvað heitirðu') >= 0 || input.indexOf('hvað heitir þú') >= 0) {		
+	} else if(input.match(/^(hvað heitir(ð)?u|hvað heitir þú)$/i)) {		
 		console.log('Interpretation: What’s your name?');
 		respondSmallTalkResponse = 'Ég heiti Sirrý.';
-	} else if(input=='ok') {		
+	} else if(input.match(/^(ok|ókei|ókey)$/i)) {		
 		console.log('Interpretation: OK');
 		respondSmallTalkResponse = 'Allt í lagi.';
-	} else if(input.indexOf('hver skapaði þig') >= 0 || input.indexOf('hver bjó þig til') >= 0 || input.indexOf('hver er móður þín') >= 0 || input.indexOf('hver er mamma þín') >= 0 || input.indexOf('hver er faðir þinn') >= 0 || input.indexOf('hver er pabbi þinn') >= 0) {		
+	} else if(input.match(/^(hver skapaði þig|hver bjó þig til|hver er (móður|mamma) þín|hver er (faðir|pabbi) þinn)$/i)) {		
 		console.log('Interpretation: Who made you?');
 		respondSmallTalkResponse = 'Góður og vitur maður.';
-	} else if(input.indexOf('elskarðu mig') >= 0 || input.indexOf('elskar þú mig') >= 0) {		
+	} else if(input.match(/^(elskar(ð)?u mig|elskar þú mig)$/i)) {		
 		console.log('Interpretation: Do you love me?');
 		var respondSmallTalkResponseArray = [
 			'Það þýðir ekki neitt að spyrja mig það.',
-			'Ef ég gæti fundið fyrir ást heldur þú að ég væri enn í þessu starfi?',
+			'Heldur þú að ég væri enn í þessu starfi ef ég gæti fundið fyrir ást ?',
 			'Ástin er flókið hugtak.',
 			'Ekki nota mig til að bæta sjálfsmynd þína.'
 		];
 		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
 		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
-	} else if(input.indexOf('geturðu') >= 0 || input.indexOf('getur þú') >= 0) {			
+	} else if(input.match(/^(getur(ð)?u)/i)) {			
 		console.log('Interpretation: Can you question');	
 		if(input.match(/(aðstoðað|hjálpað)/)) {			
 			console.log('Interpretation: Can you help me question');
@@ -190,7 +198,7 @@ function respondSmallTalk(input) {
 
 function respondThanks(input) {
 	var respondThanksResponse = '';
-	if(input.match(/^(takk|þakka|kæru\sþakkir)/)) {
+	if(input.match(/^(takk|þakka|(þúsund|kærar) þakkir)/)) {
 		var respondThanksResponse = [
 			'Ekkert að þakka!',
 			'Minnsta málið!',

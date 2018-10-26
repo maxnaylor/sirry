@@ -24,6 +24,14 @@ function analyseIntent(input) {
 			} else if(input.match(/(SkjáEinum)/i)) {
 				provider = 'skjar1';
 			}
+		} else if(input.match(/(í útvarpi|\sá Rás 1|\sá Rás 2)/gi)) {
+			intent = 'radioSchedule';		
+			// Radio provider
+			if(input.match(/(Rás 1)/i)) {
+				provider = 'ras1';
+			} else if(input.match(/(Rás 2)/i)) {
+				provider = 'ras2';
+			}
 		} else if(input.match(/(nýtt|helst)? ?(að frétta|frétt|á döfinni)/)) {
 			intent = 'getNews';
 			subIntent = newsSubIntent(input);			
@@ -33,7 +41,7 @@ function analyseIntent(input) {
 		} else if(input.match(/(kennitala)/gi)) {
 			intent = 'companyLookup';
 			var searchItem = input.replace(/(hvað\ er\ |hver\ er\ )kennitala\ /gi, '');				
-		} else if(input.match(/[0-9]\ ?(\+|\–|\-|×|÷|plús|mínus|sinnum|deilt með|)\ ?[0-9]/gi)) {
+		} else if(input.match(/([0-9]+)? ?(\+|\–|\-|×|÷|plús|mínus|sinnum|deilt með|ferningsrót af|kvaðratrót af) ?[0-9]+/gi)) {
 			intent = 'arithmetic';
 			if(input.match(/(\+|plús)/gi)) {
 				subIntent = 'addition';
@@ -43,6 +51,8 @@ function analyseIntent(input) {
 				subIntent = 'multiplication';
 			} else if(input.match(/(÷|deilt með)/gi)) {
 				subIntent = 'division';
+			} else if(input.match(/(ferningsrót|kvaðratrót)/gi)) {
+				subIntent = 'squareroot';
 			}
 		} else if(input.match(/(á ensku)/gi)) {			
 			intent = 'inEnglish';

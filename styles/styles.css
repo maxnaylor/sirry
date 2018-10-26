@@ -638,9 +638,9 @@
 
 /* TV guide */ 
 
-.card img.provider {
+.card.tvguide img.provider {
 	height: 24px;
-	margin: 10px 0 10px 0;
+	margin: 10px 0 10px 0 !important;
 }
 
 .card a.moreinfo {
@@ -668,6 +668,12 @@
 	border-bottom: 1px solid #efefef;
 }
 
+@media (prefers-color-scheme: dark) {
+	.card.tvguide table tr {
+		border-bottom: 1px solid #666;
+	}
+}
+
 .card.tvguide table tr:last-of-type  {
 	border-bottom: none;
 }
@@ -677,8 +683,14 @@
 }
 
 .card.tvguide table tr td.time {
+	width: 60px;
 	font-weight: bold;
 }
+
+.card.tvguide table tr td.noschedule {
+	font-style: italic;
+}
+
 .card.tvguide table tr td span {
 	color: #ccc;
 	font-style: italic;

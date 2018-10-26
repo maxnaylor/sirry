@@ -2,17 +2,23 @@
 
 
 function respondArithmetic(input) {
+	var analysis = analyseIntent(input);
 	var respondArithmeticResponse = '';
 	var strippedInput = input.replace(/(plús)/, '+');
 	    strippedInput = strippedInput.replace(/(–|mínus|minus)/gi, '-');
 	    strippedInput = strippedInput.replace(/(×|sinnum)/gi, '*');
 	    strippedInput = strippedInput.replace(/(÷|deilt með)/gi, '/');
+	    strippedInput = strippedInput.replace(/(ferningsrót af|kvaðratrót af)/gi, '');
 	    strippedInput = strippedInput.replace(/[^0-9\.,\+\-\*\/]/gi, '');
 	    strippedInput = strippedInput.replace('.', '');
 	    strippedInput = strippedInput.replace(',', '.');
-	if(strippedInput.match(/[\+\-\*\/]/gi)) {
+	if(analysis.intent=='arithmetic') {
 		console.log('Interpretation: Perform arithmetic');
-		answer = String(eval(strippedInput));		
+		if(analysis.subIntent=='squareroot') {	
+			answer = String(Math.sqrt(strippedInput));
+		} else {						
+			answer = String(eval(strippedInput));	
+		}	
 		answer = answer.replace('.',',');
 		answer = addSeparators(answer);
 		appendOutput({ output: answer });
