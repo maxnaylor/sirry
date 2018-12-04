@@ -1,0 +1,250 @@
+/* Wrapper */
+
+#dialogWrapper {
+	display: none;
+	position: absolute;
+	top: 0; bottom: 0;
+	left: 0; right: 0;
+	background-color: rgba(255, 255, 255, 0.58);
+	z-index: 10000;
+}
+
+
+/* Dialog layout */
+
+.dialog {
+	display: none;
+	overflow: hidden;
+	margin: 100px auto;
+	width: 600px;
+	border-radius: 4px;
+	background-color: #fff;
+	padding: 12px;
+	box-shadow: 0 0 2px rgba(0,0,0,0.1),
+				0 5px 10px rgba(0,0,0,0.1),
+				0 20px 50px rgba(0,0,0,0.1);
+}
+
+.dialog .title {
+	float: left;
+	width: 100%;
+	text-align: center;
+	font-weight: bold;
+	margin: 0 0 20px 0;
+	padding: 0 0 12px 0;
+	border-bottom: 1px solid #efefef;
+}
+
+.dialog .padder {
+	margin: 10px;
+}
+
+.dialog .buttons {
+	float: left;
+	width: 100%;
+	margin: 20px 0 0 0;
+	padding: 12px 0 0 0;
+	border-top: 1px solid #efefef;
+}
+
+.dialog form {
+	float: left;
+}
+
+.dialog .row {
+	float: left;
+	width: 100%;
+	margin: 0 0 15px 0;
+}
+
+.dialog .row label.above { 
+	float: left;
+	width: 100%;
+	margin: 0 0 2px 0;
+	color: #00B6FF;
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.dialog .row label.above.error { 
+	color: #d00000;
+}
+
+.dialog .row label.checkbox { 
+	 float: left;
+}
+
+.dialog .row label.checkbox:hover {
+	color: #00B6FF;
+}
+
+.dialog .row .errorDescription {
+	float: left;
+	margin: 2px -5px;
+	padding: 2px 5px;
+	border-radius: 2px;
+	background-color: #ffe3e3;
+	color: #d00000;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.dialog .hiddenArea {
+	float: left;
+	overflow: hidden;
+	height: 0;
+	max-height: 0;
+	transition: max-height 1s ease-out;
+}
+
+.dialog .hiddenArea.visible {
+	overflow: visible;
+	height: auto;
+	max-height: 500px;
+}
+
+
+/* Dialog elements */
+
+.dialog input[type=text],
+.dialog textarea,
+.dialog select {
+	width: 100%;
+	box-sizing: border-box;
+	outline: none;
+	margin: 0 0 1px 0;
+	padding: 5px 0;
+	background: #fff;
+	color: #333;
+	border: none;
+	border-radius: 0;
+	border-bottom: 1px solid #efefef;
+	font-size: 17px;
+	resize: none;
+}
+
+.dialog input[type=text]:hover,
+.dialog textarea:hover,
+.dialog select:hover {	
+	color: #00B6FF;
+	border-bottom: 1px solid #00B6FF;
+}
+
+.dialog input[type=text]:focus,
+.dialog textarea:focus,
+.dialog select:focus {	
+	margin: 0;
+	border-bottom: 2px solid #00B6FF;
+}
+
+.dialog input[type=text].error,
+.dialog textarea.error,
+.dialog select.error {
+	margin: 0;
+	color: #d00000;
+	border-bottom: 2px solid #d00000;
+}
+
+.dialog select {
+	background-image: url('../images/dropdown_off.svg');
+	background-repeat: no-repeat;
+	background-position: right 10px;
+}
+
+.dialog select:hover,
+.dialog select:active {
+	background-image: url('../images/dropdown_on.svg');
+}
+
+.dialog input[type=button] {
+	float: left;
+	padding: 10px 20px;
+	outline: none;
+	border: 0;
+	border-radius: 4px;
+	background-color: #006AFF;
+	color: #fff;
+	font-size: 15px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.dialog input[type=button].second {
+	padding: 9px 19px;
+	color: #333;
+	border: 1px solid #efefef;
+	background-color: #fff;
+}
+
+.dialog input[type=button]:hover {	
+	padding: 10px 20px;
+	color: #fff;
+	border: none;
+	background-color: #00B6FF;
+	box-shadow: 0 0 1px rgba(0,0,0,0.5), 
+				0 2px 5px rgba(0,0,0,0.2);
+}
+
+.dialog input[type=button]:active {	
+	box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.dialog input[type=button].right {
+	float: right;
+}
+
+.dialog .buttons input[type=button] {
+	float: right;
+	margin: 0 0 0 10px;
+}
+
+.dialog input[type=checkbox] {
+	float: left;
+	outline: none;
+	width: 17px;
+	height: 17px;
+	margin: 0 8px 0 0;
+	border-radius: 2px;
+	border: 1px solid #efefef;
+}
+
+.dialog input[type=checkbox]:hover {
+	border: 1px solid #00B6FF;
+}
+
+.dialog input[type=checkbox]:checked {
+	border: 1px solid #00B6FF;
+	background-color: #00B6FF;
+	background-image: url('../images/tick.svg');
+	background-position: 0 -1px;
+}
+
+
+/* Feedback dialog */
+
+.dialog.feedback.fullwidth {	
+	width: 400px;
+}
+
+.dialog.feedback form {
+	width: 308px;
+}
+
+.dialog.feedback.fullwidth form {
+	width: 100%;
+}
+
+#convoSample {
+	overflow: scroll;
+	float: left;
+	width: 250px;
+	height: 250px;
+	border: 1px solid #efefef;
+	border-radius: 4px;
+	margin: 0 20px 0 0;
+	padding: 5px 10px;
+	box-sizing: border-box;
+}

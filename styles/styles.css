@@ -1,6 +1,7 @@
 /* Import core */
 
 @import url("core.css");
+@import url("dialog.css");
 
 
 /* Layout */
@@ -81,20 +82,20 @@
 
 #textbox .input:focus {
 	margin: 0;
-	border-bottom: 2px solid #00a3ff;
-	animation: pulse 2s infinite;
+	border-bottom: 2px solid #00B6FF;
+	animation: pulse 3s infinite;
 }
 
 @keyframes pulse {
-	  0%   { border-bottom: 2px solid #00a3ff; }
-	  50%  { border-bottom: 2px solid #80d1ff; }
-	  100% { border-bottom: 2px solid #00a3ff; }
+	  0%   { border-bottom: 2px solid #00B6FF; }
+	  50%  { border-bottom: 2px solid #008DD3; }
+	  100% { border-bottom: 2px solid #00B6FF; }
 }
 
 #output {
 	float: left;
 	overflow: hidden;
-	padding: 0 0 100px 0;
+	padding: 50px 0 100px 0;
 	width: 100%;
 }
 
@@ -112,7 +113,8 @@
 	width: auto;
 }
 
-#output .bubble {
+#output .bubble ,
+#convoSample .bubble {
 	position: relative;
 	float: left;
 	background: #f3f2f0;
@@ -129,10 +131,27 @@
 	}
 }
 
-#output .bubble.input {
+#output .bubble.input,
+#convoSample .bubble.input {
 	float: right;
-	background: #00a3ff;
+	background: #00B6FF;
 	color: #ffffff;
+}
+
+#output .bubble.output:hover .feedback {
+	position: absolute;
+	top: 0;
+	right: -30px;
+	display: block;
+	content: ' ';
+	width: 41px;
+	height: 41px;
+	cursor: pointer;
+	background-color: transparent;
+	background-image: url('../images/icon_feedback.svg');
+	background-repeat: no-repeat;
+	background-position: right 12px;
+	background-size: 23px 21px;
 }
 
 #output .bubble.loading::after {
@@ -182,6 +201,81 @@
 }
 
 
+/* Nav */
+
+nav {
+	display: block;
+	position: fixed;
+	float: left;
+	z-index: 1000;
+	width: 100%;
+	height: 58px;
+}
+
+nav .logo {
+	margin: 0 auto;
+	width: 110px;
+	height: 45px;
+	background-image: url('../images/logo-una.svg');
+	background-size: 110px 45px;
+	background-repeat: no-repeat;
+	background-position: center bottom;
+}
+
+nav .line {
+	float: left;
+	width: calc(50% - 55px);
+	height: 38px;
+	border-bottom: 2px solid #000;
+	background: #fff;
+}
+
+nav .line.right {
+	float: right;
+}
+
+nav .line a:hover {
+	border: none;
+}
+
+nav .line .help {
+	float: left;
+	width: 22px;
+	height: 26px;
+	margin: 14px 0 0 20px;
+	background-image: url('../images/icon-help.svg');
+}
+
+nav .line .speech {
+	float: right;
+	width: 140px;
+	height: 30px;
+	margin: 12px 20px 0 0;
+	background-image: url('../images/icon-speech-on.svg');
+	background-repeat: no-repeat;
+	background-position: right;
+}
+
+@keyframes fadeout {
+    0%   {opacity: 1; display: block;}
+    100% {opacity: 0; display: none;}
+}
+
+nav .line .speech span.fadeout {
+	padding: 6px 0;
+	font-size: 13px;
+	color: #333;
+	animation-name: fadeout;
+	animation-duration: 1.5s;
+	animation-delay: 1s;
+	animation-fill-mode: forwards;
+}
+
+nav .line .speech.off {
+	background-image: url('../images/icon-speech-off.svg');
+}
+
+
 /* Data cards */
 
 .card {
@@ -212,6 +306,49 @@
 }
 
 
+/* Road conditions */
+
+.card.roadconditions {
+	width: 100%;
+	padding: 0;
+}
+
+.card.roadconditions .roadnumber {
+	float: left;
+	min-width: 30px;
+	padding: 2px 5px;
+	border-radius: 4px;
+	border: 3px solid #333;
+	background-color: #fdc71d;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.card.roadconditions .road {
+	float: left;
+	font-weight: bold;
+	padding: 10px;
+}
+
+.card.roadconditions .road .highland {
+	color: #fff;
+	background-color: #333;
+	padding: 2px 4px;
+	border-radius: 2px;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 11px;
+}
+
+.card.roadconditions .condition {
+	float: left;
+	width: 100%;
+	padding: 10px 10px;
+	box-sizing: border-box;
+}
+
+
 /* Weather */
 
 .card.weather .row {
@@ -236,6 +373,7 @@
 	text-align: right;
 	font-size: 33px;
 	line-height: 33px;
+	width: 50px;
 	padding: 0 5px 9px 0;
 }
 
@@ -251,6 +389,13 @@
 	padding: 0 10px;
 }
 
+@media  screen and (max-width: 414px) {
+	.card.weather .row.today .hour {
+		width: 27px;
+	}
+}
+
+
 .card.weather .row.today .hour .time {
 	float: left;
 	margin: 0 0 10px 0;
@@ -260,7 +405,7 @@
 
 .card.weather .row.today .hour .symbol {
 	float: left;
-	margin: 5px 0 0 4px;
+	margin: 5px 0 0 0;
 }
 
 .card.weather .row.today .hour .symbol {
@@ -284,15 +429,35 @@
 	margin: 7px 10px 7px 40px;
 }
 
+@media  screen and (max-width: 414px) {
+	.card.weather .row .symbol {
+		margin: 7px 10px 7px 30px;
+	}
+}		
+
 .card.weather .symbol {	
+	margin: 0 auto;
 	width: 32px;
 	height: 32px;
 	background-size: 32px 32px;
 	background-repeat: no-repeat;
+	background-position: center;
+}
+
+@media  screen and (max-width: 414px) {
+	.card.weather .symbol {	
+		width: 24px;
+		height: 24px;
+		background-size: 24px 24px;
+	}
 }
 
 .card.weather .symbol.clear {
 	background-image: url('../images/weather_clear.svg');
+}
+
+.card.weather .symbol.clear.night {
+	background-image: url('../images/weather_clearnight.svg');
 }
 
 .card.weather .symbol.partly {
@@ -383,20 +548,95 @@
 	background-image: url('../images/weather_thunder.svg');
 }
 
-.card.weather .row .temp, .card.weather .row .windspeed {
-	float: right;
-	text-align: right;
-	padding: 12px 15px 6px 15px;
+.card.weather .row .temp {
+	float: left;
+	width: 100%;
+	text-align: center;
+	margin: 6px 0;
+	font-size: 17px;
+	font-weight: bold;
 }
 
-.card.weather .row .windspeed span {
+.card.weather .row .windspeed {
+	float: left;
+	width: 100%;
+	text-align: center;
+	margin: 6px 0;
+}
+
+.card.weather .row .windspeed .winddirection {
 	display: inline-block;
-	width: 35px;
-	margin: -1px 0 0 0;
-	padding: 0 12px;
-	text-align: right;
-	font-size: 13px;
-	color: #666;
+	margin: 4px 0;
+	width: 11px;
+	height: 11px;
+	margin: 0 2px 0 0;
+	background-image: url('../images/weather_arrow.svg');
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.card.weather .row .windspeed .winddirection.N {
+	transform: rotate(0deg);
+}
+
+.card.weather .row .windspeed .winddirection.NNA {
+	transform: rotate(22.5deg);
+}
+
+.card.weather .row .windspeed .winddirection.NA {
+	transform: rotate(45deg);
+}
+
+.card.weather .row .windspeed .winddirection.ANA {
+	transform: rotate(67.5deg);
+}
+
+.card.weather .row .windspeed .winddirection.A {
+	transform: rotate(90deg);
+}
+
+.card.weather .row .windspeed .winddirection.ASA {
+	transform: rotate(112.5deg);
+}
+
+.card.weather .row .windspeed .winddirection.SA {
+	transform: rotate(135deg);
+}
+
+.card.weather .row .windspeed .winddirection.SSA {
+	transform: rotate(157.5deg);
+}	
+
+.card.weather .row .windspeed .winddirection.S {
+	transform: rotate(180deg);
+}
+
+.card.weather .row .windspeed .winddirection.SSV {
+	transform: rotate(202.5deg);
+}
+
+.card.weather .row .windspeed .winddirection.SV {
+	transform: rotate(225deg);
+}
+
+.card.weather .row .windspeed .winddirection.VSV {
+	transform: rotate(247.5deg);
+}
+
+.card.weather .row .windspeed .winddirection.V {
+	transform: rotate(270deg);
+}
+
+.card.weather .row .windspeed .winddirection.VNV {
+	transform: rotate(292.5deg);
+}
+
+.card.weather .row .windspeed .winddirection.NV {
+	transform: rotate(315deg);
+}
+
+.card.weather .row .windspeed .winddirection.NNV {
+	transform: rotate(337.5deg);
 }
 
 
@@ -653,6 +893,43 @@
 	margin: 5px 0 3px 0;
 }
 
+.card a.watch {
+	float: right;
+	color: #fff;
+	background-color: #00a3ff;
+	border-radius: 2px;
+	margin: 5px 0;
+	padding: 8px 15px;
+	height: 17px;
+	transition: 0.25s;
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.card a.watch:hover {
+	border: none;
+	background-color: #80d1ff;
+}
+
+.card a.watch span.premium {
+	position: relative;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    top: -1px;
+	margin: 0 0 0 4px;
+	padding: 1px;
+	border: 1px solid #fff;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 9px;
+    letter-spacing: -1px;
+    text-align: center;
+	font-weight: bold;
+	text-transform: none;
+}
+
 .card.tvguide {
 	padding: 5px 10px;	
 }
@@ -680,6 +957,7 @@
 
 .card.tvguide table tr td {
 	padding: 5px 0;
+	vertical-align: top;
 }
 
 .card.tvguide table tr td.time {
@@ -856,8 +1134,23 @@
 
 /* Providers */
 
+.providerText {
+	float: right;
+	font-size: 11px;
+	color: #ccc;
+}
+
+.providerText a {
+	color: #ccc;
+}
+
+.providerText a:hover {	
+	text-decoration: underline;
+	border: none;
+}
+
 .providerLogo {
-	float: left;
+	float: right;
 	height: 40px;
 	background-size: cover;
 	margin: 8px 0 0 0;
@@ -870,6 +1163,11 @@
 .providerLogo.vedurstofa {
 	width: 63px;
 	background-image: url('../images/provider_vedurstofa.png');
+}
+
+.providerLogo.vegagerdin {
+	width: 48px;
+	background-image: url('../images/provider_vegagerdin.svg');
 }
 
 .providerLogo.straeto {
@@ -924,14 +1222,12 @@
 /* Speech */
 
 #speech {
-	position: fixed;
-	display: block;
-	top: 30px; right: 30px;
+	float: right;
 	height: 17px;
+	margin: 14px 14px;
 	padding: 7px 45px 7px 7px;
 	cursor: pointer;
 	text-align: right;
-	background-color: #ffffff;
 	background-position: right;
 	background-repeat: no-repeat;
 	font-size: 90%;
@@ -948,7 +1244,6 @@
 #speech.disabled {
 	cursor: default;
 	background-image: url('../images/speech_off.svg');
-	opacity: 0.5;
 }
 
 #speech.off {
@@ -974,7 +1269,7 @@
 #notification {
 	display: none;
 	position: fixed;
-	right: 80px;
+	right: 60px;
 	top: 20px;
 	padding: 15px 20px;
 	width: 250px;
@@ -1095,13 +1390,6 @@
 
 
 /* Help */
-
-#helptext {
-	position: fixed;
-	display: block;
-	margin: 20px;	
-	z-index: 1000;
-}
 
 #helpcommands .close {
 	position: absolute;

@@ -9,8 +9,8 @@
 <!--AWS-->
 <script src="js/keys.js"></script>
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.13.min.js"></script>
-<!--Sirrý-->
-<script src="js/sirry.js"></script>
+<!--Una-->
+<script src="js/una.js"></script>
 <script src="js/analyse.js"></script>
 <script src="js/log.js"></script>
 <script src="js/data/data.declension.js"></script>

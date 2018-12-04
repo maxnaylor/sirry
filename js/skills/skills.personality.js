@@ -143,17 +143,17 @@ function respondSmallTalk(input) {
 			respondSmallTalkResponse = 'Mér þykir jafnvænt um allar manneskjur.';
 		} else if(input.indexOf('hver ertu') >= 0 || input.indexOf('hver ert þú') >= 0) {
 			console.log('Interpretation: Who are you?');
-			respondSmallTalkResponse = 'Ég er Sirrý, aðstoðarmaðurinn þinn.';
+			respondSmallTalkResponse = 'Ég er Una, aðstoðarmaðurinn þinn.';
 		} else if(input.indexOf('hvers dóttir') >= 0 || input.indexOf('hvers dóttir') >= 0) {
 			console.log('Interpretation: What’s your surname?');
-			respondSmallTalkResponse = 'Ég á hvorki móður né föður. Ég heiti bara Sirrý.';
+			respondSmallTalkResponse = 'Ég á hvorki móður né föður. Ég heiti bara Una.';
 		} else if(input.indexOf('hvar') >= 0) {
 			console.log('Interpretation: Where are you?');
 			respondSmallTalkResponse = 'Einhvers staðar í skýjunum, eða á ég að segja skýinu?';
 		}
 	} else if(input.match(/^(hvað heitir(ð)?u|hvað heitir þú)$/i)) {		
 		console.log('Interpretation: What’s your name?');
-		respondSmallTalkResponse = 'Ég heiti Sirrý.';
+		respondSmallTalkResponse = 'Ég heiti Una.';
 	} else if(input.match(/^(ok|ókei|ókey)$/i)) {		
 		console.log('Interpretation: OK');
 		respondSmallTalkResponse = 'Allt í lagi.';

@@ -10,11 +10,11 @@ function logQuery(query) {
 		data: dataString,
 		success: function(data) {
 			var queryData = JSON.parse(data);
-			console.log('Query successfully logged in database.');
+			console.log('Query successfully logged in database');
 			$lastQueryID = queryData.queryID;
 		},  
 		error: function(request, status, error) { 
-			console.error('Error logging query in database.');
+			console.error('Error logging query in database');
 		}					
 	});	
 }
@@ -26,10 +26,10 @@ function logResponse(response) {
 		url: 'bin/queries/log.response.php',  
 		data: dataString,
 		success: function(data) {
-			console.log('Response successfully logged in database.');
+			console.log('Response successfully logged in database');
 		},  
 		error: function(request, status, error) { 
-			console.error('Error logging response in database.');
+			console.error('Error logging response in database');
 		}					
 	});	
 }

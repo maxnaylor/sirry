@@ -19,7 +19,7 @@ $(document).ready(function() {
 		}
 	});
 	// Intialise help text
-	$('#helptext').off().click(function(event) {
+	$('#helpbutton').off().click(function(event) {
 		showCommands();
 	});
 	$('#helpcommands .close').off().click(function(event) {
@@ -128,35 +128,35 @@ function checkAWSCompatible() {
 }
 
 function activateSpeech() {
-	if(!$('#speech').hasClass('disabled')) {
+	if(!$('#speechbutton').hasClass('disabled')) {
 		$.cookie('speechActivated',1);
-		$('#speech span').removeClass();
+		$('#speechbutton span').removeClass();
 		$('#input').focus();
-		$('#speech').removeClass().addClass('on');
-		$('#speech').html('<span>Kveikt á upplestri</span>');	
-		$('#speech span').addClass('fadeout');
-		$('#speech').off().click(function() {
+		$('#speechbutton').removeClass().addClass('speech on');
+		$('#speechbutton').html('<span>Kveikt á upplestri</span>');	
+		$('#speechbutton span').addClass('fadeout');
+		$('#speechbutton').off().click(function() {
 			deactivateSpeech();
 		});		
 	}
 }
 
 function deactivateSpeech() {	
-	if(!$('#speech').hasClass('disabled')) {
+	if(!$('#speechbutton').hasClass('disabled')) {
 		$.cookie('speechActivated',0);
-		$('#speech span').removeClass();
+		$('#speechbutton span').removeClass();
 		$('#input').focus();
-		$('#speech').removeClass().addClass('off');
-		$('#speech').html('<span>Slökkt á upplestri</span>');	
-		$('#speech span').addClass('fadeout');
-		$('#speech').off().click(function() {
+		$('#speechbutton').removeClass().addClass('speech off');
+		$('#speechbutton').html('<span>Slökkt á upplestri</span>');	
+		$('#speechbutton span').addClass('fadeout');
+		$('#speechbutton').off().click(function() {
 			activateSpeech();
 		});
 	}
 }
 
 function speechNotCompatible() {	
-	$('#speech').addClass('disabled').off().mouseenter(function() {
+	$('#speechbutton').addClass('disabled').off().mouseenter(function() {
 		$('#notification').addClass('visible');
 	}).mouseleave(function() {
 		$('#notification').removeClass();
@@ -198,6 +198,7 @@ function parseInput() {
 			if(!response) { response = respondArithmetic(input); }
 			if(!response) { response = respondTV(input); }
 			if(!response) { response = respondRadio(input); }
+			if(!response) { response = respondRoadConditions(input); }
 			if(!response) { response = respondCompanyLookup(input); }
 			if(!response) { response = respondNews(input); }
 			if(!response) { response = respondWhatIs(input); }
@@ -225,9 +226,12 @@ function parseInput() {
 	}
 }
 
+var s = 1;
+
 function appendInput(input) {
 	input = cleanInput(input);
-	$('#output').append('<div class="bubble input">'+input+'</div>');
+	$('#output').append('<div class="bubble input" id="input'+s+'">'+input+'</div>');
+	s++;
 	stickyOutput();
 	$('html, body').animate({ scrollTop: $(document).height() }, 'slow');
 	$('#input').val('');
@@ -243,9 +247,14 @@ function cleanProperNouns(input) {
 	inputArray = input.split(' ');
 	input = '';
 	$.each(inputArray, function(index,value) {
-		if(value.match(properNouns)) {
+		var checkValue = value.charAt(0).toUpperCase()+value.slice(1);
+		    checkValue = decline(checkValue,'nom');	
+		if(checkValue.match(properNouns)) {
 			console.log('“'+value+'” converted to uppercase');
 			value = value.charAt(0).toUpperCase() + value.slice(1);	
+		} else if(checkRoad(checkValue)) {
+			console.log('“'+value+'” appears to be road name, converted to uppercase');
+			value = value.charAt(0).toUpperCase() + value.slice(1);
 		} else {
 			//console.log('“'+value+'” not converted to uppercase');
 		}
@@ -328,7 +337,11 @@ function correctSpelling(input) {
 	input = input.replace(/\b(ruv|rúv)\b/g, 'RÚV');
 	input = input.replace(/\b(rás 1)\b/g, 'Rás 1');
 	input = input.replace(/\b(rás 2)\b/g, 'Rás 2');
+	input = input.replace(/\b(stöð 2 bíó)\b/g, 'Stöð 2 Bíó');
+	input = input.replace(/\b(stöð 2 sport)\b/g, 'Stöð 2 Sport');
 	input = input.replace(/\b(stöð 2)\b/g, 'Stöð 2');
+	input = input.replace(/\b(stöð 3)\b/g, 'Stöð 3');
+	input = input.replace(/\b(n4)\b/g, 'N4');
 	input = input.replace(/\b(skjáeinum)\b/g, 'SkjáEinum');
 	input = input.replace(/\b(morgunblaðinu)\b/g, 'Morgunblaðinu');
 	input = input.replace(/\b(mogganum)\b/g, 'Mogganum');
@@ -338,6 +351,8 @@ function correctSpelling(input) {
 
 
 // Output
+
+var r = 1;
 
 function appendOutput(data) {
 	if(!data.dontSpeak) {
@@ -354,7 +369,11 @@ function appendOutput(data) {
 		data.outputData = '';
 	}
 	setTimeout(function() { 
-		$('#output').append('<div class="bubble output">'+data.output+data.outputData+'</div>');
+		$('#output').append('<div class="bubble output" id="output'+r+'">'+data.output+data.outputData+'<div class="feedback"></div></div>');
+		$('#output .bubble.output .feedback').off().click(function() {
+			showFeedbackDialog($(this).parent().attr('id'));
+		});
+		r++;
 		stickyOutput();
 		$('html, body').animate({ scrollTop: $(document).height() }, 'slow');
 		if(data.executeFunction) {
@@ -449,4 +468,175 @@ function parseDate(str) {
 
 function reformatNumber(str) {
 	return str.toString().replace(/\./gi, ',');
+}
+
+
+// Grammar
+
+function decline(word,gramCase) {
+	if(word.match(/ /g)) { 
+		console.log('String contains multiple words');
+ 	} else {
+		//console.log('Searching declension database for “'+word+'” in '+gramCase);
+		if(gramCase=='nom') {
+			var regex = /(veg|vegi)$/gi;
+			if(word.match(regex)) {
+				word = word.replace(regex, 'vegur');
+			} 
+			var regex = /(göngum)$/gi;
+			if(word.match(regex)) {
+				word = word.replace(regex, 'göng');
+			} 	
+			var regex = /(götu)$/gi;
+			if(word.match(regex)) {
+				word = word.replace(regex, 'gata');
+			} 		
+			var declinedWord = $.grep(countryDeclensions, function(e) { 
+				if(e.acc === word) { return this; }
+				if(e.dat === word) { return this; }
+				if(e.gen === word) { return this; }
+			});	
+			if(declinedWord[0]) { 
+				word = declinedWord[0].nom; 
+			} else {
+				//console.log('Word “'+word+'” not found in database');
+			}
+			return word;
+		}
+		if(gramCase=='acc') {
+			var declinedWord = $.grep(countryDeclensions, function(e) { 
+				return e.nom === word;	
+			});		
+			if(declinedWord[0]) { 
+				word = declinedWord[0].acc; 			
+			} else {
+				//console.log('Word “'+word+'” not found in database');
+				return word;
+			}
+		}
+		if(gramCase=='dat') {
+			var regex = /(vegur)$/gi;
+			if(word.match(regex)) {
+				word = word.replace(regex, 'vegi');
+			} 
+			var regex = /(göng)$/gi;
+			if(word.match(regex)) {
+				word = word.replace(regex, 'göngum');
+			} 	
+			var regex = /(gata)$/gi;
+			if(word.match(regex)) {
+				word = word.replace(regex, 'götu');
+			} 
+			var declinedWord = $.grep(countryDeclensions, function(e) { 
+				return e.nom === word;	
+			});		
+			if(declinedWord[0]) { 
+				word = declinedWord[0].dat; 			
+			} else {
+				//console.log('Word “'+word+'” not found in database');
+				return word;
+			}
+		}
+		if(gramCase=='gen') {
+			var declinedWord = $.grep(countryDeclensions, function(e) { 
+				return e.nom === word;	
+			});		
+			if(declinedWord[0]) { 
+				word = declinedWord[0].gen; 			
+			} else {
+				//console.log('Word “'+word+'” not found in database');
+				return word;
+			}
+		}
+		return word;
+	}
+}
+
+
+// Dialogs 
+
+function hideDialog() {
+	$('#dialogWrapper').hide();
+	$('#feedbackDialog').hide();
+	$('#input').focus();
+}
+
+function showFeedbackDialog(reply) {
+	$('#dialogWrapper').show();
+	$('#feedbackDialog').show();
+	$('#feedbackType').focus();
+	$('#feedbackDialog').removeClass('fullwidth');
+	// Reset form
+	$('#feedbackForm')[0].reset();	
+	$('#feedbackForm .hiddenArea').removeClass('visible');
+	resetErrors();
+	if(!reply) {
+		$('#convoSample').remove();
+		$('#feedbackDialog').addClass('fullwidth');
+	} else {
+		$('#convoSample').empty();
+		var query = $('#'+reply).prevAll('.bubble.input:last').html();
+		$('#convoSample').append('<div class="bubble input">'+query+'</div>');
+		var reply = $('#'+reply).html();
+		$('#convoSample').append('<div class="bubble output">'+reply+'</div>');
+	}
+	// Bindings
+	$('#feedbackForm input, #feedbackForm textarea').off().keyup(function() {
+		$(this).removeClass('error');
+		$(this).prev('.errorDescription').remove();
+		$(this).prev('label').removeClass('error');
+	});
+	$('#feedbackContact').off().click(function() {
+		if(this.checked) {
+			$('#feedbackForm .hiddenArea').addClass('visible');
+			$('#feedbackName').focus();
+		} else {			
+			$('#feedbackForm .hiddenArea').removeClass('visible');
+		}
+	});
+	$('#feedbackCancel').off().click(function() {
+		hideDialog();
+	});
+	$('#feedbackSubmit').off().click(function() {
+		var errors = [];
+		// Reset validation
+		resetErrors();
+		// Validation form
+		if(!$('#feedbackDescription').val()) {
+			$('#feedbackDescription').addClass('error');
+			$('label[for="feedbackDescription"]').addClass('error');
+				errors.push({ field: 'feedbackDescription', error: 'Lýsingu vantar.' });
+		}
+		if($('#feedbackContact').prop('checked')) {
+			if(!$('#feedbackName').val()) {
+				$('#feedbackName').addClass('error');
+				$('label[for="feedbackName"]').addClass('error');
+				errors.push('#feedbackName');
+				errors.push({ field: 'feedbackName', error: 'Nafn vantar.' });
+			}
+			if(!$('#feedbackEmail').val()) {
+				$('#feedbackEmail').addClass('error');
+				$('label[for="feedbackEmail"]').addClass('error');
+				errors.push({ field: 'feedbackEmail', error: 'Netfang vantar.' });
+			} else if(!$('#feedbackEmail').val().match(/[0-9a-z-_.]+@[0-9a-z-_]+\.[0-9a-z\.]+/gi)) {
+				$('#feedbackEmail').addClass('error');
+				$('label[for="feedbackEmail"]').addClass('error');
+				errors.push({ field: 'feedbackEmail', error: 'Ógilt netfang.' });
+			}
+		}
+		console.log(errors);
+		if(errors.length>0) {
+			for(i=0; i<errors.length; i++) {
+				$('<div class="errorDescription">'+errors[i].error+'</div>').insertBefore('#'+errors[i].field);
+			}
+			$('#'+errors[0].field).focus();
+		} else {
+			hideDialog();
+		}
+	});
+	function resetErrors() {
+		$('.errorDescription').remove();
+		$('label').removeClass('error');
+		$('input, textarea, select').removeClass('error');
+	}
 }

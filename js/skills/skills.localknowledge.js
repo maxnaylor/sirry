@@ -4,7 +4,11 @@ function respondPetrol(input) {
 	var analysis = analyseIntent(input);
 	var response = '';
 	if(analysis.intent=='petrolPrice') {
-		console.log('Interpretation: Request for petrol prices');
+		if(analysis.place) {
+			console.log('Interpretation: Request for petrol prices in '+analysis.place.placeName);
+		} else {			
+			console.log('Interpretation: Request for petrol prices in local area');
+		}
 		respondLoading();
 		$.ajax({
 			url: 'proxy.php?u=http://apis.is/petrol/',
@@ -13,43 +17,56 @@ function respondPetrol(input) {
 			type: 'GET',
 			success: function(response) {					    
 				loadingComplete();
-				if(navigator.geolocation) {
-					navigator.geolocation.getCurrentPosition(function (position) {			
-						var userLat  = position.coords.latitude;
-						var userLon  = position.coords.longitude;	
-						var nearestStation = getClosestWeatherStation(userLat+','+userLon);
-						if((userLat>66.7 || userLat<63.1) || (userLon>-12.4 || userLon<-25)) {
-							loadingComplete();
-							console.log('User outside of Iceland');
-							appendOutput({ output: 'Ég get einungis flett upp bensínverðum á Íslandi.' });	
-						} else {
-							retrieveForecastData(input,nearestStation);
-						}	
-					}, locationError);
+				if(analysis.place) {
+					var outputPhrase = 'Þetta eru lægstu bensínverðin '+analysis.place.prep+' '+decline(analysis.place.placeName,'dat')+':';
+					var userLat = analysis.place.lat;
+					var userLon = analysis.place.lon;
+					renderOutput();
 				} else {					
-					loadingComplete();
-					appendOutput({ output: 'Ég veit ekki hvar þú ert.' });
-				}
-				var $prices = '';
-				console.log(response.results);	
-				response.results.sort(dynamicSort('bensin95'));
-			    $prices = $prices+'<div class="card petrol"><table>';
-			    $prices = $prices+'<tr><th>Bensín 95<th>Dísel</th><th>&nbsp;</th></tr>';	    
-				$.each(response.results, function(i2, v2) {	
-					var latDistance = diff(v2.geo.lat,userLat);
-					var lonDistance = diff(v2.geo.lon,userLon);
-					if(latDistance<0.01 && lonDistance <0.01) {
-						$prices = $prices+'<tr><td class="petrol">'+reformatNumber(v2.bensin95)+'</td>';
-						$prices = $prices+'<td class="diesel">'+reformatNumber(v2.diesel)+'</td>';
-						$prices = $prices+'<td>'+v2.company+'<br />';
-						$prices = $prices+'<span>'+v2.name+'</span></td></tr>';
-						console.log(latDistance+','+lonDistance);
+					var outputPhrase = 'Þetta eru lægstu bensínverðin í nágrenninu:';
+					if(navigator.geolocation) {
+						navigator.geolocation.getCurrentPosition(function (position) {			
+							var userLat  = position.coords.latitude;
+							var userLon  = position.coords.longitude;	
+							if((userLat>66.7 || userLat<63.1) || (userLon>-12.4 || userLon<-25)) {
+								loadingComplete();
+								console.log('User outside of Iceland');
+								appendOutput({ output: 'Ég get einungis flett upp bensínverðum á Íslandi.' });	
+							} else {
+								renderOutput();
+							}
+						}, locationError);
+					} else {					
+						loadingComplete();
+						appendOutput({ output: 'Ég veit ekki hvar þú ert.' });
 					}
-			    });
-				$prices = $prices+'</table>';
-			    $prices = $prices+'</div>';
-				appendOutput({ output: 'Þetta eru lægstu bensínverðin í nágrenninu:<br />'+$prices,
-					           outputPhrase: 'Þetta eru lægstu bensínverðin í nágrenninu:' });
+				}
+				function renderOutput() {
+					var prices = '';
+					// Sort results and get top 3
+					response.results.sort(dynamicSort('bensin95'));
+				    prices += '<div class="card petrol"><table>';
+				    prices += '<tr><th>Bensín 95<th>Dísel</th><th>&nbsp;</th></tr>';
+				    var j = 0;	    
+					for(i=0; i<response.results.length; i++) {
+						var latDistance = diff(response.results[i].geo.lat,userLat);
+						var lonDistance = diff(response.results[i].geo.lon,userLon);
+						if(latDistance<0.03 && lonDistance <0.03) {
+							if(j<3) {
+								prices += '<tr><td class="petrol">'+reformatNumber(response.results[i].bensin95)+'</td>';
+								prices += '<td class="diesel">'+reformatNumber(response.results[i].diesel)+'</td>';
+								prices += '<td>'+response.results[i].company+'<br />';
+								prices += '<span>'+response.results[i].name+'</span></td></tr>';
+								j++;
+							}
+						}
+				    }
+					prices += '</table>';
+				    prices += '</div>';
+					appendOutput({ output: outputPhrase,
+								   outputData: prices,
+						           outputPhrase: outputPhrase });
+				}			   
 			},
 			error: function(error) {		    
 			    loadingComplete();
@@ -58,6 +75,132 @@ function respondPetrol(input) {
 		});
 		return true;
 	}
+}
+
+function respondRoadConditions(input) {
+	var analysis = analyseIntent(input);
+	var response = '';
+	if(analysis.intent=='roadConditions') {
+		
+		console.log('Interpretation: Request for road conditions on '+analysis.place);
+		respondLoading();
+	    
+		var request = $.ajax({
+			dataType: 'json',
+			url: 'roadcache.xml.cache',
+			type: 'GET',
+			success: function(response) {
+				loadingComplete();
+				//console.log(response);				
+				if(response) {					
+					for (i = 0; i < response.length; i++) { 
+						if(response[i].StuttNafn==analysis.place) {
+							var road = i;
+						} else {
+							var explodedInput = response[i].LangtNafn.split(' ');
+							for (j=0; j<explodedInput.length; j++) {
+								var currentPlace = explodedInput[j].replace(/:/gi, '');
+								if(currentPlace==analysis.place) {									
+									var road = i;
+								}
+							}
+						} 
+					} 					
+					if(road) {
+						// Choose correct yes/no word
+						if(analysis.rawInput.match(/(ófært)/i)) {
+							var posReply = 'Nei';
+							var NegReply = 'Já';
+						} else {
+							var posReply = 'Já';
+							var NegReply = 'Nei';
+						}
+						// Choose correct preposition
+						if(analysis.place.match(/(göng)$/i)) {
+							var prep = 'í';
+						} else {
+							var prep = 'á';
+						}
+						// Generate response string
+						var conditionString = 'Hér eru nýjustu upplýsingar um færð '+prep+' '+decline(analysis.place,'dat')+':';
+						if(response[road].AstandYfirbords=='A') {
+							conditionString = posReply+', það er greiðfært '+prep+' '+decline(analysis.place,'dat')+':';
+						} else if(response[road].AstandYfirbords=='B') {
+							conditionString = posReply+', en það eru hálkublettir:';
+						} else if(response[road].AstandYfirbords=='C') {
+							conditionString = posReply+', en það er hált. Ég mæli með vetrardekkjum.';
+						} else if(response[road].AstandYfirbords=='D') {
+							conditionString = posReply+', en það er flughált. Ég mæli með vetrardekkjum.';
+						} else if(response[road].AstandYfirbords=='E') {
+							conditionString = posReply+', en það er krap. Ég mæli með vetrardekkjum.';
+						} else if(response[road].AstandYfirbords=='F') {
+							conditionString = posReply+', en það er snjóþekja. Ég mæli með vetrardekkjum.';
+						} else if(response[road].AstandYfirbords=='G') {
+							conditionString = posReply+', en það er þæfingur. Farðu varlega.';
+						} else if(response[road].AstandYfirbords=='H') {
+							conditionString = posReply+', en það er þungfært. Farðu mjög varlega.';
+						} else if(response[road].AstandYfirbords=='J') {
+							conditionString = negReply+', það er ófært vegna veðurs.';
+						} else if(response[road].AstandYfirbords=='K') {
+							conditionString = negReply+', það er ófært.';
+						} else if(response[road].AstandYfirbords=='L') {
+							conditionString = negReply+', vegurinn er lokaður.';
+						}
+						// Print out conditions
+						var conditionsData = '<div class="card roadconditions">';
+						    conditionsData += '<div class="road">'+expandLongRoadName(response[road].LangtNafn);
+						    if(response[road].ErHalendi) { conditionsData += '<span class="highland">Hálendisvegur</span>';	}				    
+						    conditionsData += '</div><div class="condition" style="background-color: ';
+						    conditionsData += response[road].Linulitur+';">'+response[road].StuttAstand;
+						    //conditionsData += 'Uppfært: '+moment(response[road].DagsSkrad).format('dddd');
+						    conditionsData += '</div>';
+						    conditionsData += '</div>';
+						    conditionsData += '<div class="providerText">Byggt á gögnum frá <a href="http://www.vegagerdin.is/ferdaupplysingar/faerd-og-vedur/allt-landid-faerd-kort/" target="_new">Vegagerðinni</a></div>'
+						appendOutput({ output: conditionString,
+									   outputData: conditionsData,
+									   outputString: conditionString });
+					} else {
+						appendOutput({ output: 'Ég get ekki fundið upplýsingar um færð á '+decline(analysis.place, 'dat')+'.' });
+					}
+				} else {
+					appendOutput({ output: 'Ég get ekki sótt upplýsingar um færð í augnablikinu.' });
+				}
+			},
+			error: function(error) {		    
+			    loadingComplete();
+			    appendOutput({ output: 'Ég get ekki sótt upplýsingar um færð í augnablikinu.' });
+		    }
+		});
+		
+		return true;
+		
+	}
+}
+
+function expandLongRoadName(input) {
+	var explodedInput = input.split(' ');
+	var string = '';
+	for (i=0; i<explodedInput.length; i++) {
+		word = explodedInput[i];
+		var regex = /h(\.(:?))$/gi;
+		if(explodedInput[i].match(regex)) {
+			word = explodedInput[i].replace(regex, 'heiði$&');
+		} 
+		var regex = /(v\.)$/gi;
+		if(explodedInput[i].match(regex)) {
+			word = explodedInput[i].replace(regex, 'vegur');
+		} 
+		var regex = /(v\.-)$/gi;
+		if(explodedInput[i].match(regex)) {
+			word = explodedInput[i].replace(regex, 'vegur–');
+		} 
+		var regex = /fj\.v\.$/gi;
+		if(explodedInput[i].match(regex)) {
+			word = explodedInput[i].replace(regex, 'fjarðarvegur');
+		} 
+		string += word+' ';
+	}
+	return string;
 }
 
 function respondCompanyLookup(input) {

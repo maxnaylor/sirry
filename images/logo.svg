@@ -5,8 +5,8 @@
 	 width="169.031px" height="169.031px" viewBox="0 0 169.031 169.031" enable-background="new 0 0 169.031 169.031"
 	 xml:space="preserve">
 <radialGradient id="SVGID_1_" cx="30.4478" cy="27.3306" r="150.4919" gradientUnits="userSpaceOnUse">
-	<stop  offset="0" style="stop-color:#459AD5"/>
-	<stop  offset="1" style="stop-color:#87CFF4"/>
+	<stop  offset="0" style="stop-color:#00A3FF"/>
+	<stop  offset="1" style="stop-color:#80D1FF"/>
 </radialGradient>
 <path fill="url(#SVGID_1_)" d="M24.754,144.277c6.607,6.607,14.303,12.126,22.795,16.263c11.167,5.439,23.71,8.491,36.966,8.491
 	c23.338,0,44.467-9.46,59.761-24.754s24.754-36.423,24.754-59.761c0-17.265-5.177-33.321-14.063-46.7

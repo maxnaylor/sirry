@@ -171,60 +171,6 @@ function respondWhatIs(input) {
 	}
 }
 
-function decline(word,gramCase) {
-	if(word.match(/ /g)) { 
-		console.log('String contains multiple words');
- 	}
-	console.log('Searching declension database for “'+word+'” in '+gramCase);
-	if(gramCase=='nom') {
-		var declinedWord = $.grep(countryDeclensions, function(e) { 
-			if(e.acc === word) { return this; }
-			if(e.dat === word) { return this; }
-			if(e.gen === word) { return this; }
-		});		
-		if(declinedWord[0]) { 
-			word = declinedWord[0].nom; 			
-		} else {
-			console.log('Word “'+word+'” not found in database');
-			return word;
-		}
-	}
-	if(gramCase=='acc') {
-		var declinedWord = $.grep(countryDeclensions, function(e) { 
-			return e.nom === word;	
-		});		
-		if(declinedWord[0]) { 
-			word = declinedWord[0].acc; 			
-		} else {
-			console.log('Word “'+word+'” not found in database');
-			return word;
-		}
-	}
-	if(gramCase=='dat') {
-		var declinedWord = $.grep(countryDeclensions, function(e) { 
-			return e.nom === word;	
-		});		
-		if(declinedWord[0]) { 
-			word = declinedWord[0].dat; 			
-		} else {
-			console.log('Word “'+word+'” not found in database');
-			return word;
-		}
-	}
-	if(gramCase=='gen') {
-		var declinedWord = $.grep(countryDeclensions, function(e) { 
-			return e.nom === word;	
-		});		
-		if(declinedWord[0]) { 
-			word = declinedWord[0].gen; 			
-		} else {
-			console.log('Word “'+word+'” not found in database');
-			return word;
-		}
-	}
-	return word;
-}
-
 function respondBio(input) {
 	var respondBioResponse = '';
 	if((input.indexOf('hvenær á') >= 0 || input.indexOf('afmæli') >= 0 || input.indexOf('fæddist') >= 0) && input.indexOf('ég') < 0) {
