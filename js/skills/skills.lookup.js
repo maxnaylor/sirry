@@ -238,9 +238,9 @@ function respondBio(input) {
 					if(birthInfo) {
 						birthDate = wikiDateScrubber(birthInfo[1]);
 						if(!birthDate.death) {
-							appendOutput({ output: decodeURI(searchQuery)+' er '+calculateAge(birthDate.birth)+' ára.' });
+							appendOutput({ output: decodeURI(searchQuery)+' er '+calculateAge(birthDate.birth)+'.' });
 						} else {
-							appendOutput({ output: decodeURI(searchQuery)+' lést '+calculateAge(birthDate.birth,birthDate.death)+' ára þann '+formatDate(birthDate.death)+'.' });
+							appendOutput({ output: decodeURI(searchQuery)+' lést '+calculateAge(birthDate.birth,birthDate.death)+' þann '+formatDate(birthDate.death)+'.' });
 						}
 					} else { 
 						appendOutput({ output:'Ég get ekki fundið þær upplýsingar.' });
@@ -531,5 +531,10 @@ function calculateAge(dob,dod) {
 		var today = new Date();
 	}
 	var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+	if(age.toString().match(/(\b|[02-9]+)1\b/gi)) {
+		age += ' árs';
+	} else {
+		age += ' ára';
+	}
 	return age;
 }

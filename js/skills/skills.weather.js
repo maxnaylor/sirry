@@ -18,7 +18,9 @@ function respondNorthernLights(input) {
 			type: 'GET',
 			success: function(response) {
 			    loadingComplete();
-		        var forecasts = response.query.results.aurora.night_data;	       
+			    if(response.query.results.aurora) {
+		        	var forecasts = response.query.results.aurora.night_data;
+		        }	       
 			    if(forecasts) {
 				    var forecastTable = '<div class="card northernLights">'+
 				                        '<div class="row header"><div class="column activity">Virkni</div>'+
@@ -59,7 +61,7 @@ function respondNorthernLights(input) {
 							           outputData: '<br />'+forecastTable });
 					}
 				} else {
-					appendOutput({ output: 'Mér tókst ekki að sækja nýjustu norðurljósaspána. Prófum aftur seinna.' });
+					appendOutput({ output: 'Ég get ekki sótt norðurljósaspá í augnablikinu vegna bilunar í gagnaveitu Veðurstofunnar. <a href="https://www.vedur.is/vedur/spar/nordurljos/" target="_new">Smelltu hér til að lesa nýjustu spána.</a>' });
 				}
 			}
 		});
@@ -181,95 +183,96 @@ function retrieveForecast(analysis) {
 	    ].join('');	
 	    
 	    retrieveSunTimes().done(function(data) {
-
-		    if(data.query.results.aurora) {
 			    
-			   	var isNight = false;
+		   	var isNight = false;
+		   	if(data.query.results.aurora) {
 				var sunTimes = data.query.results.aurora.night_data;
-		    
-			    // Generate weather forecast
-			    var request = $.ajax({
-					dataType: 'jsonp',
-					url: yql,
-					type: 'GET',
-					success: function(response) {
-								    
-						loadingComplete();
-						
-						if(response.query.results) {
-							
-							var textResponse = 'Hér er nýjasta veðurspáin.';
-							var forecasts = response.query.results.forecasts.station.forecast;
-							var forecastLink = response.query.results.forecasts.station.link;
-						    var forecastStartTime = moment().format('YYYY-MM-DD HH:00:00');
-						    // Time offsets
-						    if(analysis.time=='tomorrow') {
-								var textResponse = 'Hér er nýjasta veðurspáin fyrir morgundaginn.';
-							    var forecastStartTime = moment().add(1,'days').format('YYYY-MM-DD 12:00:00');
-						    } if(analysis.time=='tomorrowMorning') {
-							    var forecastStartTime = moment().add(1,'days').format('YYYY-MM-DD 06:00:00');
-						    } if(analysis.time=='tomorrowEvening') {
-							    var forecastStartTime = moment().add(1,'days').format('YYYY-MM-DD 17:00:00');
-						    }	    
-						    // Sun times
-						    var forecastSunTimes = extractSunTimes(sunTimes,forecastStartTime);
-						    // Build forecast table
-						    var forecastTable =  '<div class="card weather"><div class="row now"><div class="place">'+place+'</div>';
-						    for(i=0; i<forecasts.length; i++) { 
-							    if(forecasts[i].ftime==forecastStartTime) {		
-							    	j=1;
-								    forecastTable += '<div class="temp">'+forecasts[i].T+'°</div>';		
-						        	forecastTable += '</div>';		    
-									forecastTable += '<div class="row today">';
-									var conditions = { windSpeed: forecasts[i].F,
-										               temp: forecasts[i].T,
-										               conditions: forecasts[i].W
-										             };
-									var textResponse = generateWeatherText(conditions,analysis.time);
-								} 
-								if(forecasts[i].ftime>=forecastStartTime) {
-									if(j<7) {	
-										if(forecasts[i].ftime==moment().format('YYYY-MM-DD HH:00:00')) {
-											currentHour = 'Núna';
-										} else {
-											currentHour = moment(forecasts[i].ftime).format('HH');
-										}									
+			} else {
+				console.warn('Unable to retrieve sun time data');
+			}
+	    
+		    // Generate weather forecast
+		    var request = $.ajax({
+				dataType: 'jsonp',
+				url: yql,
+				type: 'GET',
+				success: function(response) {
+							    
+					loadingComplete();
+					
+					if(response.query.results) {
+					
+						var textResponse = 'Hér er nýjasta veðurspáin.';
+						var forecasts = response.query.results.forecasts.station.forecast;
+						var forecastLink = response.query.results.forecasts.station.link;
+					    var forecastStartTime = moment().format('YYYY-MM-DD HH:00:00');
+					    if(forecasts[0].ftime>forecastStartTime) {
+						    forecastStartTime = forecasts[0].ftime;
+					    }
+					    // Time offsets
+					    if(analysis.time=='tomorrow') {
+							var textResponse = 'Hér er nýjasta veðurspáin fyrir morgundaginn.';
+						    var forecastStartTime = moment().add(1,'days').format('YYYY-MM-DD 12:00:00');
+					    } if(analysis.time=='tomorrowMorning') {
+						    var forecastStartTime = moment().add(1,'days').format('YYYY-MM-DD 06:00:00');
+					    } if(analysis.time=='tomorrowEvening') {
+						    var forecastStartTime = moment().add(1,'days').format('YYYY-MM-DD 17:00:00');
+					    }	    
+					    // Sun times
+					    if(sunTimes) {
+					    	var forecastSunTimes = extractSunTimes(sunTimes,forecastStartTime);
+					    }
+					    // Build forecast table
+					    var forecastTable =  '<div class="card weather"><div class="row now"><div class="place">'+place+'</div>';
+					    for(i=0; i<forecasts.length; i++) { 
+						    if(forecasts[i].ftime==forecastStartTime) {		
+						    	j=1;
+							    forecastTable += '<div class="temp">'+forecasts[i].T+'°</div>';		
+					        	forecastTable += '</div>';		    
+								forecastTable += '<div class="row today">';
+								var conditions = { windSpeed: forecasts[i].F,
+									               temp: forecasts[i].T,
+									               conditions: forecasts[i].W
+									             };
+								var textResponse = generateWeatherText(conditions,analysis.time);
+							} 
+							if(forecasts[i].ftime>=forecastStartTime) {
+								if(j<7) {	
+									if(forecasts[i].ftime==moment().format('YYYY-MM-DD HH:00:00')) {
+										currentHour = 'Núna';
+									} else {
+										currentHour = moment(forecasts[i].ftime).format('HH');
+									}		
+									if(sunTimes) {							
 								    	if(moment(forecasts[i].ftime).format('HH:MM')>forecastSunTimes.sunset) {
 									    	var isNight = true;
 								    	}
-										forecastTable += '<div class="hour"><div class="time">'+currentHour+'</div>';			
-										forecastTable += '<div class="symbol'+retrieveSymbol(forecasts[i].W,isNight)+'" title="'+forecasts[i].W+'"></div>';
-										forecastTable += '<div class="temp">'+forecasts[i].T+'°</div>';
-										forecastTable += '<div class="windspeed"><div class="winddirection '+forecasts[i].D+'" title="'+forecasts[i].D+'"></div>'+forecasts[i].F+'</div></div>';
-									j++;
-									}
+							    	}
+									forecastTable += '<div class="hour"><div class="time">'+currentHour+'</div>';			
+									forecastTable += '<div class="symbol'+retrieveSymbol(forecasts[i].W,isNight)+'" title="'+forecasts[i].W+'"></div>';
+									forecastTable += '<div class="temp">'+forecasts[i].T+'°</div>';
+									forecastTable += '<div class="windspeed"><div class="winddirection '+forecasts[i].D+'" title="'+forecasts[i].D+'"></div>'+forecasts[i].F+'</div></div>';
+								j++;
 								}
-						    }
-							forecastTable += '</div></div><div class="providerText">Byggt á gögnum frá <a href="'+forecastLink+'" target="_new">Veðurstofu Íslands</a></div>'
-							// Output forecast
-							appendOutput({ output: textResponse, 
-										   outputData: '<br />'+forecastTable 
-										});	
-										
-						} else {
-							
-							appendOutput({ output: 'Ég get ekki sótt veðurspána í augnablikinu.' });
-							
-						}
+							}
+					    }
+						forecastTable += '</div></div><div class="providerText">Byggt á gögnum frá <a href="'+forecastLink+'" target="_new">Veðurstofu Íslands</a></div>'
+						// Output forecast
+						appendOutput({ output: textResponse, 
+									   outputData: '<br />'+forecastTable 
+									});	
+									
+					} else {
 						
-					}, 
-					error: function() {
-						appendOutput({ output: 'Ég get ekki sótt veðurspána í augnablikinu.' });	
+						appendOutput({ output: 'Ég get ekki sótt veðurspána í augnablikinu.' });
+						
 					}
-				});
-			
-			} else {
-				
-				console.warn('Unable to retrieve sun time data');				
-				loadingComplete();
-				appendOutput({ output: 'Ég get ekki sótt veðurspána í augnablikinu.' });
-				
-			}
+					
+				}, 
+				error: function() {
+					appendOutput({ output: 'Ég get ekki sótt veðurspána í augnablikinu.' });	
+				}
+			});
 			
 	    });
 	   

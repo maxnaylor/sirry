@@ -3,11 +3,10 @@
 
 function respondArithmetic(input) {
 	var analysis = analyseIntent(input);
-	var respondArithmeticResponse = '';
 	var strippedInput = input.replace(/(plús)/, '+');
 	    strippedInput = strippedInput.replace(/(–|mínus|minus)/gi, '-');
-	    strippedInput = strippedInput.replace(/(×|sinnum)/gi, '*');
-	    strippedInput = strippedInput.replace(/(÷|deilt með)/gi, '/');
+	    strippedInput = strippedInput.replace(/(×|∙|sinnum)/gi, '*');
+	    strippedInput = strippedInput.replace(/(÷|:|deilt með)/gi, '/');
 	    strippedInput = strippedInput.replace(/(ferningsrót af|kvaðratrót af)/gi, '');
 	    strippedInput = strippedInput.replace(/[^0-9\.,\+\-\*\/]/gi, '');
 	    strippedInput = strippedInput.replace('.', '');
@@ -24,18 +23,6 @@ function respondArithmetic(input) {
 		appendOutput({ output: answer });
 		return true;
 	}
-}
-
-function addSeparators(nStr) {
-    nStr += '';
-    var x = nStr.split(',');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? ',' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + '.' + '$2');
-    }
-    return x1 + x2;
 }
 
 function respondRandomNumber(input) {
@@ -154,10 +141,125 @@ function respondCurrencyConversion(input) {
 			}
 	    });
 		return true;
-	} 
+	}
 	*/
 }
 
-function numberWithDots(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+function respondConversion(input) {
+	var analysis = analyseIntent(input);
+	if(analysis.intent=='conversion') {
+		var response = '';
+		input = wordsToDigits(input);
+		var sourceUnitRegex = new RegExp('\\b([0-9,.]+ ?)('+unitsData+')\\b','gi');
+		var targetUnitRegex = new RegExp('\\b([^0-9,.]+ ?)('+unitsData+')\\b','gi');
+		var sourceUnit = input.match(sourceUnitRegex)[0];
+		    sourceUnit = wordsToDigits(sourceUnit);
+		var targetUnit = input.match(targetUnitRegex)[0];
+		// Conversion data
+		var conversionData = getConversionUnitData(sourceUnit,targetUnit);
+		if(!conversionData) {
+			console.log('Unable to convert between stated units');
+			response  = 'Ég get ekki breytt á milli þessara mælieininga.';
+		} else {
+			// Extract numbers
+			var sourceFigureRegex = new RegExp('([0-9.,]+ ?)('+unitsData+')','gi');
+			var sourceFigureWithUnit = sourceUnit.match(sourceFigureRegex);
+			var sourceFigure = sourceFigureWithUnit[0].match(/[0-9,.]+/gi);
+			    sourceFigure = angliciseInt(sourceFigure);		
+			var targetFigure = sourceFigure*conversionData.multiplier;
+			    targetFigure = icelandiciseInt(targetFigure);		
+			if(sourceFigure.match(/([^1]|^)1$/gi)) {
+				var verb = 'er';
+				sourceUnit = changeNumber(conversionData.sourceUnit,'sing');
+			} else {
+				var verb = 'eru'
+				sourceUnit = changeNumber(conversionData.sourceUnit,'plu');
+			}
+			if(targetFigure.match(/([^1]|^)1$/gi)) {
+				targetUnit = changeNumber(conversionData.targetUnit,'sing');
+			} else {
+				targetUnit = changeNumber(conversionData.targetUnit,'plu');
+			}
+			targetFigure = icelandiciseInt(roundTo(targetFigure,2));
+		}
+		if(!response) {
+			response = addSeparators(digitsToWords(sourceFigure,conversionData.sourceGender))+
+		               ' '+sourceUnit+' '+verb+' '+addSeparators(digitsToWords(targetFigure,conversionData.targetGender))+
+		               ' '+targetUnit+'.';
+		    response = firstToUpper(response);
+		}
+		appendOutput({ output: response });
+		return true;
+	}
+}
+
+function getConversionUnitData(sourceUnit,targetUnit) {
+	var conversionData = '';
+	// Length
+	if(sourceUnit.match(/(tomm(a|ur))/i) && targetUnit.match(/(cm|sm|sentímet(e)?r(i|ar|um))/i)) {
+		console.log('Convert inches to centimetres');
+		var conversionData = { 'multiplier'   : 2.54, 
+			                   'sourceGender' : 'f',
+			                   'sourceUnit'   : 'tomma',
+			                   'targetGender' : 'm',			                   
+			                   'targetUnit'   : 'sentímetri' };
+	} 
+	if(sourceUnit.match(/(cm|sm|sentímet(e)?r(i|ar|um))/i) && targetUnit.match(/(tomm(a|ur))/i)) {
+		console.log('Convert centimetres to inches');
+		var conversionData = { 'multiplier'   : 0.3937008, 
+			                   'sourceGender' : 'm',
+			                   'sourceUnit'   : 'sentímetri',
+			                   'targetGender' : 'f',			                   
+			                   'targetUnit'   : 'tommur' };
+	} 
+	// Weight
+	if(sourceUnit.match(/(mörk|merkur)/i) && targetUnit.match(/(gr(a|ö)mm|g)/i)) {		
+		console.log('Convert marks to grams');
+		var conversionData = { 'multiplier'   : 250, 
+			                   'sourceGender' : 'f',
+			                   'sourceUnit'   : 'mörk',
+			                   'targetGender' : 'n',			                   
+			                   'targetUnit'   : 'gramm' };
+	} 
+	if(sourceUnit.match(/(gr(a|ö)mm|g)/i) && targetUnit.match(/(mörk|merkur)/i)) {
+		console.log('Convert grams to marks');
+		var conversionData = { 'multiplier'   : 0.004, 
+			                   'sourceGender' : 'n',			                   
+			                   'sourceUnit'   : 'gramm',
+			                   'targetGender' : 'f',			                   
+			                   'targetUnit'   : 'mörk' };
+	}
+	if(sourceUnit.match(/(pund|lb)/i) && targetUnit.match(/(gr(a|ö)mm|g)/i)) {		
+		console.log('Convert pounds to grams');
+		var conversionData = { 'multiplier'   : 453.59237, 
+			                   'sourceGender' : 'n',
+			                   'sourceUnit'   : 'pund',
+			                   'targetGender' : 'n',			                   
+			                   'targetUnit'   : 'gramm' };
+	} 
+	if(sourceUnit.match(/(gr(a|ö)mm|g)/i) && targetUnit.match(/(pund|lb)/i)) {
+		console.log('Convert grams to pounds');
+		var conversionData = { 'multiplier'   : 0.0022, 
+			                   'sourceGender' : 'n',			                   
+			                   'sourceUnit'   : 'gramm',
+			                   'targetGender' : 'n',			                   
+			                   'targetUnit'   : 'pund' };
+	}
+	if(sourceUnit.match(/(úns(a|u|um))/i) && targetUnit.match(/(gr(a|ö)mm|g)/i)) {		
+		console.log('Convert ounces to grams');
+		var conversionData = { 'multiplier'   : 28.35, 
+			                   'sourceGender' : 'n',
+			                   'sourceUnit'   : 'únsa',
+			                   'targetGender' : 'n',			                   
+			                   'targetUnit'   : 'gramm' };
+	} 
+	if(sourceUnit.match(/(gr(a|ö)mm|g)/i) && targetUnit.match(/(úns(a|u|um))/i)) {
+		console.log('Convert grams to ounces');
+		var conversionData = { 'multiplier'   : 0.0035, 
+			                   'sourceGender' : 'n',			                   
+			                   'sourceUnit'   : 'gramm',
+			                   'targetGender' : 'n',			                   
+			                   'targetUnit'   : 'únsa' };
+	}
+	return conversionData;
 }

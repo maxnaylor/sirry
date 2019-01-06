@@ -6,7 +6,39 @@ function respondTime(input) {
 	var response = '';
 	if(analysis.intent=='currentTime') {
 		var time = moment().format('LT');
-		response = 'Klukkan er '+time+'.';
+		if(analysis.place) {			
+			if(analysis.place.error) {
+				response = 'Ég kannast ekki við staðinn „'+analysis.place.placeInput+'“.';
+			} else {
+				if(analysis.place.capital) {
+					if(analysis.place.capital.placeName instanceof Array) {
+						var capitalPlaceName = analysis.place.capital.placeName[0];
+					} else {
+						var capitalPlaceName = analysis.place.capital.placeName;
+					}
+					var offsetTime = moment.tz(analysis.place.capital.timeZone).format('LT');
+					response =  'Klukkan í '+decline(capitalPlaceName,'dat')+' er '+offsetTime+'.';
+					/*
+					response += '<div class="card clock">';
+					response += '<div class="clockface"><div class="notches"></div><div class="notches one"></div><div class="notches two"></div><div class="notches three"></div><div class="notches four"></div><div class="notches five"></div>';
+					response += '<div class="hand hour"></div><div class="hand minute"></div><div class="hand second"></div></div>';
+					response  += '<div class="time">'+offsetTime+'</div>';
+					response  += '<div class="place">'+analysis.place.capital.placeName+' ('+decline(analysis.place.placeName,'dat')+')</div>';
+					response += '</div>';
+					*/
+				} else {
+					if(analysis.place.placeName instanceof Array) {
+						var placeName = analysis.place.placeName[0];
+					} else {
+						var placeName = analysis.place.placeName;
+					}
+					var offsetTime = moment.tz(analysis.place.timeZone).format('LT');
+					response = 'Klukkan í '+decline(placeName,'dat')+' er '+offsetTime+'.';
+				}
+			}			
+		} else {
+			response = 'Klukkan er '+time+'.';
+		}
 	} else if(analysis.intent=='currentDay') {
 		var day = moment().format('dddd Do MMMM');
  		response = 'Í dag er '+day+'.';

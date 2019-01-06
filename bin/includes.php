@@ -6,6 +6,8 @@
 <script src="js/offline-master/offline.min.js"></script>
 <script src="js/chattykathy/ChattyKathy.js"></script>
 <script src="js/moment/moment-with-locales.js"></script>
+<script src="js/moment/moment-timezone-with-data.min.js"></script>
+<script src="js/spotify/spotify-web-api.js"></script>
 <!--AWS-->
 <script src="js/keys.js"></script>
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.13.min.js"></script>
@@ -13,15 +15,18 @@
 <script src="js/una.js"></script>
 <script src="js/analyse.js"></script>
 <script src="js/log.js"></script>
+<script src="js/text.js"></script>
 <script src="js/data/data.declension.js"></script>
 <script src="js/data/data.parse.js"></script>
 <script src="js/data/data.place.js"></script>
+<script src="js/data/data.units.js"></script>
 <script src="js/skills/skills.clock.js"></script>
 <script src="js/skills/skills.language.js"></script>
 <script src="js/skills/skills.localknowledge.js"></script>
 <script src="js/skills/skills.location.js"></script>
 <script src="js/skills/skills.lookup.js"></script>
 <script src="js/skills/skills.maths.js"></script>
+<script src="js/skills/skills.media.js"></script>
 <script src="js/skills/skills.meta.js"></script>
 <script src="js/skills/skills.news.js"></script>
 <script src="js/skills/skills.personality.js"></script>

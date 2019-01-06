@@ -1,3 +1,4 @@
+<?php require_once('library.php'); ?>
 <!--Styles!-->
 <link href="styles/styles.css" rel="stylesheet" type="text/css" />
 <!--JQuery + Plugins -->
@@ -11,3 +12,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
+<?php
+function truncate($string) {
+	return (iconv_strlen($string) > 43) ? iconv_substr($string,0,40).'…' : $string;	
+}
+?>

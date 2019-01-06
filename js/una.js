@@ -186,9 +186,11 @@ function parseInput() {
 			if(!response) { response = respondGoodBye(input); }
 			if(!response) { response = respondHowAreYou(input); }
 			if(!response) { response = respondSmallTalk(input); }
+			if(!response) { response = respondJoke(input); }
 			if(!response) { response = respondThanks(input); }
 			if(!response) { response = respondAmI(input); }
 			if(!response) { response = respondIntroductions(input); }
+			if(!response) { response = respondCanYou(input); }
 			if(!response) { response = respondSwearWords(input); }
 			if(!response) { response = respondTime(input); }
 			if(!response) { response = respondStopwatch(input); }
@@ -196,6 +198,7 @@ function parseInput() {
 			if(!response) { response = respondRandomNumber(input); }
 			// Active responses
 			if(!response) { response = respondArithmetic(input); }
+			if(!response) { response = respondConversion(input); }
 			if(!response) { response = respondTV(input); }
 			if(!response) { response = respondRadio(input); }
 			if(!response) { response = respondRoadConditions(input); }
@@ -214,6 +217,7 @@ function parseInput() {
 			if(!response) { response = respondTranslation(input); }
 			if(!response) { response = respondDeclension(input); }
 			if(!response) { response = respondPetrol(input); }
+			if(!response) { response = respondMedia(input); }
 			// Preferences
 			if(!response) { response = respondSetVoice(input); }
 		}
@@ -269,8 +273,8 @@ function scrubInput(input) {
 	input = cleanProperNouns(input);
 	input = input.replace(/\ ?(\+|plús)\ ?/gi, '+');
 	input = input.replace(/\ ?(\-|mínus|minus)\ ?/gi, '-');
-	input = input.replace(/\ ?(\*|sinnum)\ ?/gi, '×');
-	input = input.replace(/\ ?(\/|deilt með)\ ?/gi, '÷');
+	input = input.replace(/\ ?(\*|sinnum)\ ?/gi, '⋅');
+	input = input.replace(/\ ?(\/|deilt með)\ ?/gi, ' : ');
 	return input;
 }
 
@@ -326,7 +330,7 @@ function cleanInput(input) {
 			input = input+'.';
 		}
 	}
-	input = input.charAt(0).toUpperCase() + input.slice(1);
+	input = input.charAt(0).toUpperCase()+input.slice(1);
 	return input;
 }
 
@@ -336,7 +340,7 @@ function correctSpelling(input) {
 	//input = input.replace(/\b(a)\b/g, 'á');
 	input = input.replace(/\b(ruv|rúv)\b/g, 'RÚV');
 	input = input.replace(/\b(rás 1)\b/g, 'Rás 1');
-	input = input.replace(/\b(rás 2)\b/g, 'Rás 2');
+	input = input.replace(/\b(rás 2)\b/g, 'Rás 2'); 
 	input = input.replace(/\b(stöð 2 bíó)\b/g, 'Stöð 2 Bíó');
 	input = input.replace(/\b(stöð 2 sport)\b/g, 'Stöð 2 Sport');
 	input = input.replace(/\b(stöð 2)\b/g, 'Stöð 2');
@@ -417,7 +421,7 @@ function respondUnknown() {
 		appendOutput({ output: respondUnknownResponses[randomNumber], unknownInput: 1 });
 		return true;
 	} else {
-		appendOutput({ output: 'Ég skil ekki hvað þú átt við. Þú getur spurt mig um veðrið.', unknownInput: true });
+		appendOutput({ output: 'Ég skil ekki hvað þú átt við. Þú getur spurt mig um veðrið.', unknownInput: 1 });
 		return true;
 	}
 }
@@ -455,104 +459,6 @@ function stripTags(input) {
 }
 
 
-// Dates
-
-function parseDate(str) {
-	var strDate = str.replace(/-/g,":").replace(/ /g,":").split(":");
-	var aDate = Date.UTC(strDate[0], strDate[1]-1, strDate[2], strDate[3], strDate[4], strDate[5]);
-	return aDate;
-}
-
-
-// Numbers
-
-function reformatNumber(str) {
-	return str.toString().replace(/\./gi, ',');
-}
-
-
-// Grammar
-
-function decline(word,gramCase) {
-	if(word.match(/ /g)) { 
-		console.log('String contains multiple words');
- 	} else {
-		//console.log('Searching declension database for “'+word+'” in '+gramCase);
-		if(gramCase=='nom') {
-			var regex = /(veg|vegi)$/gi;
-			if(word.match(regex)) {
-				word = word.replace(regex, 'vegur');
-			} 
-			var regex = /(göngum)$/gi;
-			if(word.match(regex)) {
-				word = word.replace(regex, 'göng');
-			} 	
-			var regex = /(götu)$/gi;
-			if(word.match(regex)) {
-				word = word.replace(regex, 'gata');
-			} 		
-			var declinedWord = $.grep(countryDeclensions, function(e) { 
-				if(e.acc === word) { return this; }
-				if(e.dat === word) { return this; }
-				if(e.gen === word) { return this; }
-			});	
-			if(declinedWord[0]) { 
-				word = declinedWord[0].nom; 
-			} else {
-				//console.log('Word “'+word+'” not found in database');
-			}
-			return word;
-		}
-		if(gramCase=='acc') {
-			var declinedWord = $.grep(countryDeclensions, function(e) { 
-				return e.nom === word;	
-			});		
-			if(declinedWord[0]) { 
-				word = declinedWord[0].acc; 			
-			} else {
-				//console.log('Word “'+word+'” not found in database');
-				return word;
-			}
-		}
-		if(gramCase=='dat') {
-			var regex = /(vegur)$/gi;
-			if(word.match(regex)) {
-				word = word.replace(regex, 'vegi');
-			} 
-			var regex = /(göng)$/gi;
-			if(word.match(regex)) {
-				word = word.replace(regex, 'göngum');
-			} 	
-			var regex = /(gata)$/gi;
-			if(word.match(regex)) {
-				word = word.replace(regex, 'götu');
-			} 
-			var declinedWord = $.grep(countryDeclensions, function(e) { 
-				return e.nom === word;	
-			});		
-			if(declinedWord[0]) { 
-				word = declinedWord[0].dat; 			
-			} else {
-				//console.log('Word “'+word+'” not found in database');
-				return word;
-			}
-		}
-		if(gramCase=='gen') {
-			var declinedWord = $.grep(countryDeclensions, function(e) { 
-				return e.nom === word;	
-			});		
-			if(declinedWord[0]) { 
-				word = declinedWord[0].gen; 			
-			} else {
-				//console.log('Word “'+word+'” not found in database');
-				return word;
-			}
-		}
-		return word;
-	}
-}
-
-
 // Dialogs 
 
 function hideDialog() {
@@ -575,9 +481,15 @@ function showFeedbackDialog(reply) {
 		$('#feedbackDialog').addClass('fullwidth');
 	} else {
 		$('#convoSample').empty();
-		var query = $('#'+reply).prevAll('.bubble.input:last').html();
+		var query = $('#'+reply).prevAll('.bubble.input').html();
+		console.log(query);
+		if(typeof query == 'array') {
+			var queryCount = query.length;
+			var query = query[queryCount].html();
+		}
 		$('#convoSample').append('<div class="bubble input">'+query+'</div>');
 		var reply = $('#'+reply).html();
+		    reply = reply.replace('<div class="feedback"></div>','');
 		$('#convoSample').append('<div class="bubble output">'+reply+'</div>');
 	}
 	// Bindings
@@ -624,19 +536,44 @@ function showFeedbackDialog(reply) {
 				errors.push({ field: 'feedbackEmail', error: 'Ógilt netfang.' });
 			}
 		}
-		console.log(errors);
 		if(errors.length>0) {
 			for(i=0; i<errors.length; i++) {
 				$('<div class="errorDescription">'+errors[i].error+'</div>').insertBefore('#'+errors[i].field);
 			}
 			$('#'+errors[0].field).focus();
 		} else {
-			hideDialog();
+			submitFeedback(query,reply);
 		}
 	});
 	function resetErrors() {
 		$('.errorDescription').remove();
 		$('label').removeClass('error');
 		$('input, textarea, select').removeClass('error');
+	}
+	function submitFeedback(query,reply) {
+		var fquery = query;
+		var freply = reply;
+		var ftype = $('#feedbackType').val();
+		var fdescription = $('#feedbackDescription').val();
+		var fcontact = 0;
+		if($('#feedbackContact').is(':checked')) {
+			fcontact = 1;
+		}
+		var fname = $('#feedbackName').val();
+		var femail = $('#feedbackEmail').val();
+		var fip = $('#feedbackIP').val();
+		var dataString = 'source=1&fquery='+fquery+'&freply='+freply+'&ftype='+ftype+'&fdescription='+fdescription+'&fcontact='+fcontact+'&fname='+fname+'&femail='+femail+'&fip='+fip;
+		console.log(dataString);
+		$.ajax({ 	
+			type: 'POST', 
+			url: 'bin/queries/feedback.submit.php',  
+			data: dataString,
+			success: function(data) {
+				hideDialog();
+			},  
+			error: function(request, status, error) { 
+				console.error('Error submitting feedback');
+			}					
+		});	
 	}
 }

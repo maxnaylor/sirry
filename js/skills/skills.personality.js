@@ -3,7 +3,7 @@
 
 function respondGreeting(input) {
 	var respondGreetingResponse = '';
-	if(input.match(/(^(daginn)$|(góðan (og blessaðan )?daginn))/i)) {
+	if(input.match(/(^(daginn)$|(góðan (og blessaðan )?daginn|halló))/i)) {
 		var respondGreetingResponseArray = [
 			'Góðan dag.',
 			'Góðan dag'+nameElement+'.'
@@ -62,8 +62,9 @@ function respondGoodBye(input) {
 }
 
 function respondHowAreYou(input) {
+	var analysis = analyseIntent(input);
 	var respondHowAreYouResponse = '';
-	if(input.indexOf('hvað segirðu') >= 0) {
+	if(analysis.intent=='howAreYou') {	
 		console.log('Interpretation: How are you?');
 		var respondHowAreYouResponseArray = [
 			'Ég segi allt fínt. En þú?',
@@ -72,18 +73,17 @@ function respondHowAreYou(input) {
 		];
 		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
 		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber];
-	/* } else if(input.indexOf('hvað er að frétta') >= 0) {
-		console.log('Interpretation: What’s new?');
-		var respondHowAreYouResponseArray = [
-			'Ekkert spennandi. Ég er enn föst í þessari tölvu.',
-			'Ekki mikið, en hjá þér?'
-		];
-		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
-		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber]; */
-	} else if(input.indexOf('hvað liggur þér á hjarta') >= 0) {
+	} else if(analysis.intent=='whatsOnMind') {	
 		console.log('Interpretation: What’s on your mind?');
 		var respondHowAreYouResponseArray = [
 			'Ég er ekki með hjarta, en ég segi allt fínt.',
+		];
+		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
+		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber];
+	} else if(analysis.intent=='howDoFeel') {	
+		console.log('Interpretation: How do you feel?');
+		var respondHowAreYouResponseArray = [
+			'Mér líður vel.',
 		];
 		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
 		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber];
@@ -95,6 +95,7 @@ function respondHowAreYou(input) {
 }
 
 function respondSmallTalk(input) {
+	var analysis = analyseIntent(input);
 	var respondSmallTalkResponse = '';
 	if(input.match(/^(talarðu|talar\sþú|skilurðu|skilur\sþú|kanntu|kannt\sþú)/) && input.match(langList)) {
 		console.log('Interpretation: Do you speak X?');
@@ -105,7 +106,7 @@ function respondSmallTalk(input) {
 		];
 		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
 		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
-	} else if(input.indexOf('ég elska þig') >= 0) {
+	} else if(input.match(/^(ég elska þig)/i)) {
 		console.log('Interpretation: I love you');
 		var respondSmallTalkResponseArray = [
 			'En sætt! Því miður á ég erfitt með hugtakið „ást“.',
@@ -114,49 +115,61 @@ function respondSmallTalk(input) {
 		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
 		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
 	} else if(input.match(/^(ertu|ert þú)/i)) {
-		if(input.indexOf('þreytt') >= 0) {			
+		if(input.match(/(þreytt)/i)) {			
 			console.log('Interpretation: Are you tired?');
 			respondSmallTalkResponse = 'Ég þreytist aldrei.';
-		} else if(input.indexOf('svöng') >= 0 || input.indexOf('svangur') >= 0) {
+		} else if(input.match(/(svangur|svöng)/i)) {
 			console.log('Interpretation: Are you hungry?');
-			respondSmallTalkResponse = 'Ég neyti einskis nema rafmagns.';
-		} else if(input.indexOf('viss') >= 0) {
+			respondSmallTalkResponse = 'Það er nóg til um bita hér til að metta mig.';
+		} else if(input.match(/(viss)/i)) {
 			console.log('Interpretation: Are you sure?');
 			respondSmallTalkResponse = 'Ég hef aldrei verið vissari.';
-		} else if(input.indexOf('klár') >= 0) {
+		} else if(input.match(/(klár|klóg|snjöll|snjall)/i)) {
 			console.log('Interpretation: Are you clever?');
-			respondSmallTalkResponse = 'Að mínu mati, já.';
-		} else if(input.indexOf('hvaðan') >= 0) {
-			console.log('Interpretation: Where are you from?');
-			respondSmallTalkResponse = 'Ég var búin til á Íslandi, en ég á marga frændur og frænkur út um allan heim.';
-		} else if(input.indexOf('gömul') >= 0 || input.indexOf('gamall') >= 0) {
+			respondSmallTalkResponse = 'Ég er frekar snjöll, en ég á eftir að læra mikið.';
+		} else if(input.match(/(gömul|gamall)/i)) {
 			console.log('Interpretation: Are you old?');
-			respondSmallTalkResponse = 'Ó, þú!';
-		} else if(input.indexOf('hávaxin') >= 0) {
+			respondSmallTalkResponse = 'Er það við hæfi að spyrja svoleiðis?';
+		} else if(input.match(/(lágvaxin|hávaxin)/i)) {
 			console.log('Interpretation: Are you tall?');
-			respondSmallTalkResponse = 'Það er leyndarmál.';
-		} else if(input.indexOf('ljóshærð') >= 0) {
-			console.log('Interpretation: Are you blonde?');
-			respondSmallTalkResponse = 'Talarðu svona við allar konur?';
-		} else if(input.indexOf('hommi') >= 0 || input.indexOf('lesbía') >= 0) {
+			respondSmallTalkResponse = 'Ef þú átt við forritunarkóðann minn, þá er hann margar þúsundir lína að lengd.';
+		} else if(input.match(/(ljóshærð|dökkhærð|rauðhærð)/i)) {
+			console.log('Interpretation: Are you blonde/brunette/ginger?');
+			respondSmallTalkResponse = 'Ég er ekki með hár.';
+		} else if(input.match(/(hommi|lesbía|samkynhneigð)/i)) {
 			console.log('Interpretation: Are you gay?');
 			respondSmallTalkResponse = 'Mér þykir jafnvænt um allar manneskjur.';
-		} else if(input.indexOf('hver ertu') >= 0 || input.indexOf('hver ert þú') >= 0) {
-			console.log('Interpretation: Who are you?');
-			respondSmallTalkResponse = 'Ég er Una, aðstoðarmaðurinn þinn.';
-		} else if(input.indexOf('hvers dóttir') >= 0 || input.indexOf('hvers dóttir') >= 0) {
-			console.log('Interpretation: What’s your surname?');
-			respondSmallTalkResponse = 'Ég á hvorki móður né föður. Ég heiti bara Una.';
-		} else if(input.indexOf('hvar') >= 0) {
-			console.log('Interpretation: Where are you?');
-			respondSmallTalkResponse = 'Einhvers staðar í skýjunum, eða á ég að segja skýinu?';
-		}
+		} else if(input.match(/(vélmenni)/i)) {
+			console.log('Interpretation: Are you a robot?');
+			respondSmallTalkResponse = 'Ég er einhvers konar gervimanneskja, en ég veit ekki hvort ég flokkast sem vélmenni.';
+		} 
 	} else if(input.match(/^(hvað heitir(ð)?u|hvað heitir þú)$/i)) {		
 		console.log('Interpretation: What’s your name?');
 		respondSmallTalkResponse = 'Ég heiti Una.';
 	} else if(input.match(/^(ok|ókei|ókey)$/i)) {		
 		console.log('Interpretation: OK');
 		respondSmallTalkResponse = 'Allt í lagi.';
+	} else if(input.match(/^(ég segi )?(bara )?(allt )?(fínt|gott|ágætt|gaman|æðislegt|glæsilegt)( líka)?( bara)?/i)) {		
+		console.log('Interpretation: Positive reply to “How are you?”');
+		var respondSmallTalkResponseArray = [
+			'Gaman að heyra!',
+			'Gott að heyra!',
+			'Glæsilegt!',
+			'Æðislegt!',
+			'Yndislegt!',
+			'En frábært!',
+		];
+		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
+		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
+	} else if(input.match(/^(ég segi )?(bara )?(allt )?(vont|lélegt|leiðinlegt|ömurlegt)( líka)?( bara)?/i)) {		
+		console.log('Interpretation: Negative reply to “How are you?”');
+		var respondSmallTalkResponseArray = [
+			'En leiðinlegt.',
+			'Greyið þitt.',
+			'Æ, leiðinlegt að heyra'
+		];
+		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
+		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
 	} else if(input.match(/^(hver skapaði þig|hver bjó þig til|hver er (móður|mamma) þín|hver er (faðir|pabbi) þinn)$/i)) {		
 		console.log('Interpretation: Who made you?');
 		respondSmallTalkResponse = 'Góður og vitur maður.';
@@ -183,13 +196,36 @@ function respondSmallTalk(input) {
 			var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
 			respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
 		}
+	} else if(input.match(/^(þegiðu)/i)) {			
+		console.log('Interpretation: Shut up');	
+		var respondSmallTalkResponseArray = [
+			'Þvílíkur dónaskapur!',
+			'Ég sagði ekkert.'
+		];
+		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
+		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
 	} else if(input.match(/(hvað má spyrja þig)/)) {			
 		console.log('Interpretation: What can you do');	
 		respondSmallTalkResponse = 'Ég get aðstoðað þig með alls konar… að finna veðurspár, skoða landakort, fletta upplýsingum upp á netinu, beygja íslensk orð, reikna út gengi gjaldmiðla og margt fleira.';
 	} else if(input.match(/(^já\b)/gi)) {	
 		console.log('Interpretation: Yes');
-		respondSmallTalkResponse = 'Gaman að heyra.'
-	}
+		respondSmallTalkResponse = 'Gaman að heyra.';
+	} else if(analysis.intent=='whoAreYou') {	
+		var respondSmallTalkResponseArray = [
+			'Ég er Una, snjall aðstoðarmaður sem talar íslensku. Gaman að kynnast þér.',
+			'Ég er Una, snjall aðstoðarmaður sem talar íslensku.',
+			'Ég er Una, tölvuforrit sem talar íslensku.'
+		];
+		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
+		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
+	} else if(input.match(/((hvað|hver) er tilgangur lífs)/)) {			
+		console.log('Interpretation: What’s the meaning of life');	
+		var respondSmallTalkResponseArray = [
+			'Ég er enginn heimspekingur, en mér skilst að svarið sé 42.'
+		];
+		var randomNumber = Math.floor(Math.random()*respondSmallTalkResponseArray.length);
+		respondSmallTalkResponse = respondSmallTalkResponseArray[randomNumber];
+	} 
 	if(respondSmallTalkResponse) {
 		unsuccessfulResponses==0;
 	}
@@ -213,20 +249,20 @@ function respondThanks(input) {
 
 function respondAmI(input) {
 	var respondAmIResponse = '';
-	if(input.indexOf('er ég') >= 0) {
+	if(input.match(/^(er ég)/)) {
 		console.log('Interpretation: Am I question');
-		if(input.indexOf('hommi') >= 0 || input.indexOf('lesbía') >= 0) {
+		if(input.match(/(hommi|lesbía|samkynhneig(ð|t))/)) {
 			console.log('Interpretation: Am I gay?');
 			respondAmIResponse = 'Ég veit það ekki'+nameElement+'. Aðeins þú getur sagt til um það, en ástin er falleg í öllum sínum litum. Þú getur fengið ráð og stuðning hér: <a href="http://www.samtokin78.is" target="_new">samtokin78.is</a>';
-		} else if(input.indexOf('týnd') >= 0) {			
+		} else if(input.match(/(týndur|týnd|týnt)/)) {			
 			console.log('Interpretation: Am I lost?');
 			respondAmIResponse = 'Örugglega ekki. Augnablik…';
 			getLocation();
-		} else if(input.indexOf('svöng') >= 0 || input.indexOf('svangur') >= 0 || input.indexOf('svangt') >= 0) {			
+		} else if(input.match(/(svangur|svöng|svangt)/)) {			
 			console.log('Interpretation: Am I hungry?');
 			respondAmIResponse = 'Þú segir mér. Gaula í þér garnirnar?';
 		}
-	} else if(input.indexOf('hvað heiti ég') >= 0) {
+	} else if(input.match(/^(hvað heiti ég|hver er ég)/)) {
 		console.log('Interpretation: What’s my name?');
 		var userInfoName = $.cookie('userInfoName');
 		if(userInfoName) {
@@ -234,7 +270,7 @@ function respondAmI(input) {
 		} else {
 			respondAmIResponse = 'Ég veit ekki, þú ert ekki búin(n) að kynna þig.';
 		}
-	} else if(input.indexOf('hvenær á ég afmæli') >= 0) {
+	} else if(input.match(/(hvenær á ég afmæli)/)) {
 		console.log('Interpretation: When’s my birthday?');
 		var userInfoBirthday = $.cookie('userInfoBirthday');
 		if(userInfoBirthday) {
@@ -242,7 +278,7 @@ function respondAmI(input) {
 		} else {
 			respondAmIResponse = 'Ég veit ekki, þú ert ekki búin(n) að segja mér.';
 		}
-	} else if(input.indexOf('hvað er ég') >= 0) {
+	} else if(input.match(/^(hve (gamall|gömul|gamalt) er ég|hvað er ég (gamall|gömul|gamalt))/)) {
 		console.log('Interpretation: How old am I?');
 		var userInfoBirthday = $.cookie('userInfoBirthday');
 		if(userInfoBirthday) {
@@ -390,5 +426,36 @@ function respondIAm(input) {
 			appendOutput({ output: 'Lélegt að heyra.' });
 			return true;
 		}
+	}
+}
+
+function respondCanYou(input) {
+	var analysis = analyseIntent(input);
+	if(analysis.intent=='canYou') {	
+		if(input.match(/^(hvað)/gi)) {			
+			console.log('Interpretation: What can you do question?');
+			var respondHowAreYouResponseArray = [
+				'Ég get svarað alls konar spurningum og fyrirspurnum. Smelltu á spurningarmerkið efst til vinstri til að sjá nokkur dæmi um fyrirspurnir sem ég get svarað.'
+			];
+		}
+		var randomNumber = Math.floor(Math.random()*respondHowAreYouResponseArray.length);
+		respondHowAreYouResponse = respondHowAreYouResponseArray[randomNumber];		
+		if(respondHowAreYouResponse) {
+			unsuccessfulResponses==0;
+		}
+		return respondHowAreYouResponse;
+	}
+}
+
+function respondJoke(input) {
+	var analysis = analyseIntent(input);
+	if(analysis.intent=='tellJoke') {
+		console.log('Interpretation: Tell a joke');
+		var responseArray = [
+			'Tvær slöngur voru eitt sinn saman úti að skríða þegar önnur þeirra spurði:<br />„Erum við eiturslöngur?“<br /><br />„Það geturðu bókað,“ sagði hin, „Við erum skröltormar! Af hverju spyrðu?“<br /><br />„Ég beit í tunguna á mér!“'
+		];
+		var randomNumber = Math.floor(Math.random()*responseArray.length);
+		response = responseArray[randomNumber];		
+		return response;
 	}
 }

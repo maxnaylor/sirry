@@ -7,10 +7,12 @@ function analyseIntent(input) {
 	var searchItem = '';
 	var place = '';
 	var time = '';
-	// What questions
+	var conversionRegex = new RegExp('^(hve|hversu|hvað)? ?([\\S ]+)?('+unitsData+') ([\\S ]+)?('+unitsData+')','gi');
+	// What/who questions
 	if(input.match(/^(hvað |hver )?/i)) {	
 		if(input.match(/(klukkan)/gi)) {
 			intent = 'currentTime';
+			var place = checkPlace(input);
 		} else if(input.match(/(gamall|gömul)/gi)) {
 			intent = 'ageRequest';
 		} else if(input.match(/(dagskrá|sjónvarp|í sjónvarpi|á\s(RÚV|RÚV 2|Stöð 2 Sport|Stöð 2 Bíó|Stöð 2|Stöð 3|N4|SkjáEinum))/gi)) {
@@ -63,10 +65,22 @@ function analyseIntent(input) {
 			} else if(input.match(/(ferningsrót|kvaðratrót)/gi)) {
 				subIntent = 'squareroot';
 			}
+		} else if(input.match(conversionRegex)) {
+			intent = 'conversion';
 		} else if(input.match(/(á ensku)/gi)) {			
 			intent = 'inEnglish';
+		} else if(input.match(/(segir(ð)?u|segir þú|segist)/gi)) {			
+			intent = 'howAreYou';
+		} else if(input.match(/(liggur þér á hjarta)/gi)) {			
+			intent = 'whatsOnMind';
+		} else if(input.match(/(hvað|hver) (ertu|ert þú)/gi)) {			
+			intent = 'whoAreYou';
+		} else if(input.match(/(getur(ð)?u|getur þú)/gi)) {			
+			intent = 'canYou';
+		} else if(input.match(/(getur(ð)?u|getur þú)/gi)) {			
+			intent = 'canYou';
 		} else {			
-			if(input.match(/^(hvað |hver )/i)) {
+			if(input.match(/^(hver|hvað) (er) (?!(ég))/i)) {
 				intent = 'whatIs';
 				var searchItem = input.replace(/(hvað\ er\ |hver\ er\ )/gi, '');	
 			}	
@@ -96,7 +110,9 @@ function analyseIntent(input) {
 			intent = 'weather';
 			var place = checkPlace(input);
 			var time = checkTime(input);
-		}
+		} else if(input.match(/(líður þér)/gi)) {			
+			intent = 'howDoFeel';
+		} 
 	}
 	// Where questions
 	if(input.match(/^(hvar )?/i)) {
@@ -125,13 +141,17 @@ function analyseIntent(input) {
 			var time = checkTime(input);
 		}
 	}
-	// Show imperative
+	// Imperatives
 	if(input.match(/^(sýndu )/i)) {
-		if(input.match(/(nýtt|helst)? ?(að frétta|frétt|á döfinni)/)) {
+		if(input.match(/(nýtt|helst)? ?(að frétta|frétt|á döfinni)/i)) {
 			intent = 'getNews';
 			subIntent = newsSubIntent(input);			
 			provider = newsProvider(input);
 		}
+	} else if(input.match(/^(spilaðu )/i)) {
+		intent = 'playMedia';
+	} else if(input.match(/^(segðu|kanntu) ([\S ]+)?(brandara|djók|grín)/i)) {
+		intent = 'tellJoke';
 	}
 	// Return object
 	var intentObject = { intent: intent,
@@ -159,17 +179,51 @@ function checkRoad(input) {
 function checkPlace(input) {	
 	var place = '';
 	var timePhrases = 'dag|gær|kvöld|nótt|morgun|fyrradag|fyrramálið|fyrra|vikunni|(mánu|þriðju|miðviku|fimmtu|föstu|laugar|sunnu)dag(inn)?|næstu\\sdögum';
-	var regex = new RegExp('(á|í)\\s(?!'+timePhrases+')[a-záðéíóúþæö]+','gi');
+	var regex = new RegExp('(á|í)\\s(?!'+timePhrases+')[a-záðéíóúýþæö -]+','gi');
 	var getPlace = input.match(regex);
 	if(getPlace) {
+		placeArray = [];
 		var thisPlace = getPlace[0].replace(/(á|í)\s/gi, '');
-		    thisPlace = thisPlace.charAt(0).toUpperCase()+thisPlace.slice(1);
+			if(!thisPlace.match(/(klakanum|borginni)/i)) {
+				thisPlace = thisPlace.charAt(0).toUpperCase()+thisPlace.slice(1);
+			}		    
 		    thisPlace = decline(thisPlace,'nom');
-		    console.log(thisPlace);
-		for(j=0; j<icelandPlaceData.length; j++) {
-			if(icelandPlaceData[j].placeName==thisPlace) {
-				place = icelandPlaceData[j];
+		var placeMatch = new RegExp('^('+thisPlace+')$','gi');
+		for(j=0; j<allPlaceData.length; j++) {
+			var thisPlaceName = allPlaceData[j].placeName;
+			// Check countries and major cities
+			if(thisPlaceName instanceof Array) {
+				for(l=0; l<thisPlaceName.length; l++) {
+					if(thisPlaceName[l].match(placeMatch)) {
+						placeArray.push(allPlaceData[j]);
+					}
+				}
+			} else {
+				if(thisPlaceName.match(placeMatch)) {
+					placeArray.push(allPlaceData[j]);
+				}
 			}
+			// Check capital cities
+			if(placeArray.length==0) {
+				if(allPlaceData[j].capital) {
+					var thisCapitalName = allPlaceData[j].capital.placeName;
+					if(thisCapitalName instanceof Array) {
+						for(l=0; l<thisCapitalName.length; l++) {
+							if(thisCapitalName[l].match(placeMatch)) {
+								placeArray.push(allPlaceData[j]);
+							}
+						}
+					} else {
+						if(allPlaceData[j].capital.placeName.match(placeMatch)) {
+							placeArray.push(allPlaceData[j]);
+						}
+					}
+				}
+			}
+		}
+		place = placeArray[0];
+		if(!place) {
+			place = { 'error': 1, 'placeInput': getPlace[0].replace(/(á|í)\s/gi, '') };
 		}
 	}
 	return place;

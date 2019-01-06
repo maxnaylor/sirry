@@ -47,6 +47,7 @@ require_once 'bin/includes.php';
 			</tr>
 		</table>
 		<input type="button" class="begin" value="Kynnast Unu" onclick="hideOnboarding();" />
+		<p class="cookiewarning">Vefkökur eru notaðar á þessari síðu. Með því að smella á hnappinn fyrir ofan samþykkir þú notkun vefkakna á þessari síðu.</p>
 	</div>
 	<nav>
 		<div class="line left">
@@ -97,12 +98,14 @@ require_once 'bin/includes.php';
 		<h1>Klukkan</h1>
 		<ul>
 			<li><a>„Hvað er klukkan?“</a></li>
+			<li><a>„Hvað er klukkan í Köben?“</a></li>
 			<li><a>„Hvaða dagur var fyrir 10 dögum?“</a></li>
 			<li><a>„Settu tímamæli í gang.“</a></li>
 		</ul>
 		<h1>Stærðfræði</h1>
 		<ul>
 			<li><a>„Hvað er 37 sinnum 150?“</a></li>
+			<li><a>„Hvað eru 14 merkur mörg grömm?“</a></li>
 		</ul>
 	</div>
 	<div id="timer">00:00:00</div>
@@ -122,10 +125,10 @@ require_once 'bin/includes.php';
 						<div class="row">
 							<label class="above" for="feedbackType">Tegund villu</label>
 							<select id="feedbackType">
-								<option value="misunderstanding">Una skildi ekki fyrirspurn mína</option>
-								<option value="wrongAnswer">Svarið var vitlaust/átti ekki við</option>
-								<option value="bug">Una hegðaði sér á skrýtinn hátt</option>
-								<option value="suggestion">Ábending</option>
+								<option value="1">Una skildi ekki fyrirspurn mína</option>
+								<option value="2">Svarið var vitlaust/átti ekki við</option>
+								<option value="3">Una hegðaði sér á skrýtinn hátt</option>
+								<option value="0">Ábending</option>
 							</select>		
 						</div>	
 						<div class="row">		
@@ -145,6 +148,7 @@ require_once 'bin/includes.php';
 								<input type="text" id="feedbackEmail" />
 							</div>
 						</div>
+						<input type="hidden" id="feedbackIP" value="<?php echo $_SERVER['REMOTE_ADDR']; ?>" />
 					</form>
 				</div>
 			<div class="buttons">

@@ -136,6 +136,8 @@
 	float: right;
 	background: #00B6FF;
 	color: #ffffff;
+	width: aut
+	text-align: right;
 }
 
 #output .bubble.output:hover .feedback {
@@ -222,12 +224,25 @@ nav .logo {
 	background-position: center bottom;
 }
 
+@media (prefers-color-scheme: dark) {
+	nav .logo {
+		background-image: url('../images/logo-una_dark.svg');
+	}
+}
+
 nav .line {
 	float: left;
 	width: calc(50% - 55px);
 	height: 38px;
 	border-bottom: 2px solid #000;
 	background: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+	nav .line {		
+		border-bottom: 2px solid #fff;
+		background: #333;
+	}
 }
 
 nav .line.right {
@@ -246,6 +261,12 @@ nav .line .help {
 	background-image: url('../images/icon-help.svg');
 }
 
+@media (prefers-color-scheme: dark) {
+	nav .line .help {			
+		background-image: url('../images/icon-help_dark.svg');
+	}
+}
+
 nav .line .speech {
 	float: right;
 	width: 140px;
@@ -254,6 +275,12 @@ nav .line .speech {
 	background-image: url('../images/icon-speech-on.svg');
 	background-repeat: no-repeat;
 	background-position: right;
+}
+
+@media (prefers-color-scheme: dark) {
+	nav .line .speech {			
+		background-image: url('../images/icon-speech-on_dark.svg');
+	}
 }
 
 @keyframes fadeout {
@@ -271,8 +298,20 @@ nav .line .speech span.fadeout {
 	animation-fill-mode: forwards;
 }
 
+@media (prefers-color-scheme: dark) {
+	nav .line .speech span.fadeout {
+		color: #fff;
+	}
+}
+
 nav .line .speech.off {
 	background-image: url('../images/icon-speech-off.svg');
+}
+
+@media (prefers-color-scheme: dark) {
+	nav .line .speech.off {	
+		background-image: url('../images/icon-speech-off_dark.svg');
+	}
 }
 
 
@@ -1132,6 +1171,117 @@ nav .line .speech.off {
 }
 
 
+/* Clock */
+
+.card.clock {
+	
+}
+
+.clockface {
+	position: relative;
+	overflow: hidden;
+	float: left;
+	width: 100px;
+	height: 100px;
+	margin: 20px 30px;
+	border-radius: 50%;
+	background: #e5e3e0;
+}
+
+.clockface .notches {
+	position: absolute;
+	top: 0; left: 49px;
+	height: 80px;
+	width: 2px;
+	border-top: 10px solid #000;
+	border-bottom: 10px solid #000;
+	opacity: 0.1;
+}
+
+.clockface .notches.one {
+	transform: rotate(30deg);
+}
+
+.clockface .notches.two {
+	transform: rotate(60deg);
+}
+
+.clockface .notches.three {
+	transform: rotate(90deg);
+}
+
+.clockface .notches.four {
+	transform: rotate(120deg);
+}
+
+.clockface .notches.five {
+	transform: rotate(150deg);
+}
+
+.clockface .hand {
+	position: absolute;
+	left: 49px;
+}
+
+.clockface .hand.hour {
+	top: 15px;
+	width: 2px;
+	height: 44px;
+	background: #333;
+	border-radius: 2px;
+    transform-origin: 0 45px;
+    animation-name: seconds;
+    animation-duration: 216000s;
+    animation-timing-function: linear;
+}
+
+.clockface .hand.minute {
+	top: 5px;
+	width: 2px;
+	height: 54px;
+	background: #333;
+	border-radius: 2px;
+    transform-origin: 0 45px;
+    animation-name: seconds;
+    animation-duration: 3600s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.clockface .hand.second {
+	top: 5px;
+	width: 1px;
+	height: 54px;
+	background: #cf0000;
+	border-radius: 2px;
+    transform-origin: 0 45px;
+    animation-name: seconds;
+    animation-duration: 60s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes seconds {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.card.clock .time {
+	float: left;
+	width: 50%;
+	font-size: 28px;
+	margin: 38px 0 0 0;
+}
+
+.card.clock .place {
+	float: left;
+	width: 50%;
+	font-size: 15px;
+	margin: 5px 0 0 0;
+}
+
+
+
 /* Providers */
 
 .providerText {
@@ -1340,6 +1490,7 @@ nav .line .speech.off {
 	font-size: 140%;
 	line-height: 160%;
 	width: 40%;
+	max-width: 575px;
 	margin: 10px auto;
 }
 
@@ -1386,6 +1537,13 @@ nav .line .speech.off {
 
 #onboarding .begin:hover {
 	background: #80d1ff;
+}
+
+#onboarding p.cookiewarning {
+	margin: 30px auto;
+	width: 35%;
+	max-width: 500px;
+	color: #999;
 }
 
 
