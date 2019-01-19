@@ -3,23 +3,22 @@
 function respondNorthernLights(input) {
 	var analysis = analyseIntent(input);
 	if(analysis.intent=='northernLights') {	
+		
 		console.log('Interpretation: Request for northern lights forecast');
 		respondLoading();
-		var xmlSource = 'https://xmlweather.vedur.is/aurora?op=xml&type=index';
-		var yql = [
-	        'https://query.yahooapis.com/v1/public/yql',
-	        '?q=' + encodeURIComponent("select * from xml where url='" + xmlSource + "'"),
-	        '&format=json&callback=?'
-	    ].join('');
+		
+		var xmlSource = encodeURIComponent('https://xmlweather.vedur.is/aurora?op=xml&type=index');
 	    
-	    var request = $.ajax({
-			dataType: 'jsonp',
-			url: yql,
-			type: 'GET',
-			success: function(response) {
+	    $.ajax({ 
+			dataType: 'json',
+			url: 'proxy.php?url='+xmlSource,
+			success: function(response) {	
+				
+				console.log(response);
+					
 			    loadingComplete();
-			    if(response.query.results.aurora) {
-		        	var forecasts = response.query.results.aurora.night_data;
+			    if(response.night_data) {
+		        	var forecasts = response.night_data;
 		        }	       
 			    if(forecasts) {
 				    var forecastTable = '<div class="card northernLights">'+
@@ -63,6 +62,12 @@ function respondNorthernLights(input) {
 				} else {
 					appendOutput({ output: 'Ég get ekki sótt norðurljósaspá í augnablikinu vegna bilunar í gagnaveitu Veðurstofunnar. <a href="https://www.vedur.is/vedur/spar/nordurljos/" target="_new">Smelltu hér til að lesa nýjustu spána.</a>' });
 				}
+			},
+			error: function() {
+				
+				loadingComplete();
+				appendOutput({ output: 'Ég get ekki sótt norðurljósaspá í augnablikinu.</a>' });
+				
 			}
 		});
 		return true;
@@ -71,44 +76,55 @@ function respondNorthernLights(input) {
 
 function respondAvalancheWarning(input) {
 	if(input.match(/(snjóflóð)/)) {	
+		
 		console.log('Interpretation: Request for avalanche warnings');
 		respondLoading();
-		var xmlSource = 'http://xmlweather.vedur.is/avalanche?op=xml&type=status';
-		var yqlURL = [
-	        'https://query.yahooapis.com/v1/public/yql',
-	        '?q=' + encodeURIComponent("select * from xml where url='" + xmlSource + "'"),
-	        '&format=xml&callback=?'
-	    ].join('');
-	    $.getJSON(yqlURL, function(data) {
-		    loadingComplete();
-	        var xmlContent = $(data.results[0]);
-			var todaysForecast = '';
-		    var forecastTable = '<div class="card avalanche">';
-		    var day = new Date().getDay();
-		    // Try to retrieve local forecast first
-	        var forecastData = $(xmlContent).find('area_forecast').each(function(index) {
-		        var region          = $(this).find('region').text();
-		        var dangerLevel     = $(this).find('danger_level').text();
-		        var dangerLevelCode = $(this).find('danger_level_code').text();
-		        var forecast        = $(this).find('short_forecast').text();
-				forecastTable = forecastTable+'<div class="row"><div class="region">'+region+'</div><div class="dangerlevel l'+dangerLevelCode+'">'+dangerLevel+'</div><div class="forecast">'+forecast+'</div></div>';
-		    });
-		    if(forecastData[0]) {
-			    forecastTable = forecastTable+'</div><a class="providerLogo vedurstofa" href="http://www.vedur.is/ofanflod/snjoflodaspa/" target="_new"></a>';
-			    appendOutput({ output: 'Hér eru síðustu snjóflóðaviðvaranir:', outputData: '<br />'+forecastTable });
-			} else {				
-		    	// Try to retrieve latest conditions if local forecast unavailable
-			    var forecastData = $(xmlContent).find('conditions').each(function(index) {
-			        var forecast   =  $(this).find('short_description').text();
-			        var updateTime =  $(this).find('update_time').text();
-					forecastTable += '<div class="row"><div class="forecast">'+forecast+'<br />('+moment(updateTime).fromNow()+')</div></div>';
-			    });
-				if(forecastData[0]) {
-				    forecastTable += '</div><div class="providerText">Byggt á gögnum frá <a href="https://www.vedur.is/#syn=snjoflod" target="_new">Veðurstofu Íslands</a></div>'
-				    appendOutput({ output: 'Hér eru nýjustu upplýsingarnar:', outputData: '<br />'+forecastTable });
-			    } else {
-					appendOutput({ output: 'Ég get ekki náð í snjóflóðaviðvaranir núna. Prófum aftur seinna.' });
+		
+		var xmlSource = encodeURIComponent('https://xmlweather.vedur.is/avalanche?op=xml&type=status');
+	    
+	    $.ajax({ 
+			dataType: 'json',
+			url: 'proxy.php?url='+xmlSource,
+			success: function(response) {
+				
+			    loadingComplete();
+				var todaysForecast = '';
+			    var forecastTable = '<div class="card avalanche">';
+			    var day = new Date().getDay();
+			    
+			    // Try to retrieve local forecast first
+			    if(response.area_forecasts) {
+				    
+				    var forecastData = response.area_forecasts.area_forecast;
+				    
+			    	for(i=0; i<forecastData.length; i++) {
+						forecastTable += '<div class="row"><div class="region">'+forecastData[i].region+'</div>'+
+		                        		 '<div class="dangerlevel l'+forecastData[i].danger_level_day1_code+'">'+forecastData[i].danger_level_day1+'</div>'+
+										 '<div class="forecast">'+forecastData[i].forecast+'</div></div>';
+		            }
+		            forecastTable += '</div><div class="providerText">Byggt á gögnum frá <a href="http://www.vedur.is/ofanflod/snjoflodaspa/" target="_new">Veðurstofu Íslands</a></div>'
+				    appendOutput({ output: 'Hér eru síðustu snjóflóðaviðvaranir:', outputData: '<br />'+forecastTable });
+				    
+				} else {				
+			    	// Try to retrieve latest conditions if local forecast unavailable
+				    var forecastData = $(xmlContent).find('conditions').each(function(index) {
+				        var forecast   =  $(this).find('short_description').text();
+				        var updateTime =  $(this).find('update_time').text();
+						forecastTable += '<div class="row"><div class="forecast">'+forecast+'<br />('+moment(updateTime).fromNow()+')</div></div>';
+				    });
+					if(forecastData[0]) {
+					    forecastTable += '</div><div class="providerText">Byggt á gögnum frá <a href="https://www.vedur.is/#syn=snjoflod" target="_new">Veðurstofu Íslands</a></div>'
+					    appendOutput({ output: 'Hér eru nýjustu upplýsingarnar:', outputData: '<br />'+forecastTable });
+				    } else {
+						appendOutput({ output: 'Ég get ekki náð í snjóflóðaviðvaranir núna. Prófum aftur seinna.' });
+					}
 				}
+			},
+			error: function() {
+				
+				loadingComplete();
+				appendOutput({ output: 'Ég get ekki sótt norðurljósaspá í augnablikinu.</a>' });
+				
 			}
 	    });
 		return true;
@@ -153,18 +169,12 @@ function retrieveForecast(analysis) {
 		}
 	}
 	function retrieveSunTimes() {
-		console.log('Retrieving sun time data');		
-		var xmlSource = 'http://xmlweather.vedur.is/aurora?op=xml&type=index';		
-		var yql = [
-	        'https://query.yahooapis.com/v1/public/yql',
-	        '?q=' + encodeURIComponent("select * from xml where url='" + xmlSource + "'"),
-	        '&format=json&callback=?'
-	    ].join('');
-	    var request = $.ajax({
-			dataType: 'jsonp',
-			url: yql,
-			type: 'GET'
-	    });
+		console.log('Retrieving sun time data');			
+		var xmlSource = encodeURIComponent('http://xmlweather.vedur.is/aurora?op=xml&type=index');	    
+	    var request = $.ajax({ 
+			dataType: 'json',
+			url: 'proxy.php?url='+xmlSource
+		});
 	    return request;
 	}
 	function retrieveForecastData(input,nearestStation,place) {	
@@ -175,36 +185,34 @@ function retrieveForecast(analysis) {
 		}
 		console.log('Seeking forecast from weather station '+nearestStation.station_id+' in '+nearestStation.station_name);	
 		
-		var xmlSource = 'http://xmlweather.vedur.is/?op_w=xml&type=forec&lang=is&view=xml&ids='+nearestStation.station_id;		
-		var yql = [
-	        'https://query.yahooapis.com/v1/public/yql',
-	        '?q=' + encodeURIComponent("select * from xml where url='" + xmlSource + "'"),
-	        '&format=json&callback=?'
-	    ].join('');	
-	    
+		var xmlSource = encodeURIComponent('https://xmlweather.vedur.is/?op_w=xml&type=forec&lang=is&view=xml&ids='+nearestStation.station_id);
+		
+		console.log(xmlSource);
+			    
 	    retrieveSunTimes().done(function(data) {
 			    
 		   	var isNight = false;
-		   	if(data.query.results.aurora) {
-				var sunTimes = data.query.results.aurora.night_data;
+		   	if(data.aurora) {
+				var sunTimes = data.aurora.night_data;
 			} else {
 				console.warn('Unable to retrieve sun time data');
 			}
 	    
 		    // Generate weather forecast
-		    var request = $.ajax({
-				dataType: 'jsonp',
-				url: yql,
-				type: 'GET',
+		    var request = $.ajax({ 
+				dataType: 'json',
+				url: 'proxy.php?url='+xmlSource,
 				success: function(response) {
+					
+					console.log(response);
 							    
 					loadingComplete();
 					
-					if(response.query.results) {
+					if(response) {
 					
 						var textResponse = 'Hér er nýjasta veðurspáin.';
-						var forecasts = response.query.results.forecasts.station.forecast;
-						var forecastLink = response.query.results.forecasts.station.link;
+						var forecasts = response.station.forecast;
+						var forecastLink = response.station.link;
 					    var forecastStartTime = moment().format('YYYY-MM-DD HH:00:00');
 					    if(forecasts[0].ftime>forecastStartTime) {
 						    forecastStartTime = forecasts[0].ftime;

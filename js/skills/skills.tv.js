@@ -70,77 +70,71 @@ function respondTV(input) {
 		
 		if(analysis.provider=='ruv' || analysis.provider=='ruv2') {
 			
-			var yql = URL = [
-		        'https://query.yahooapis.com/v1/public/yql',
-		        '?q=' + encodeURIComponent("select service from xml where url='"+channel.feedURL+ "'"),
-		        '&format=json&callback=?'
-		    ].join('');	
+			console.log(channel.feedURL);
 		
-			var request = $.ajax({
-			dataType: 'jsonp',
-			url: yql,
-			type: 'GET',
-			success: function(response) {
-								    
-				loadingComplete();
-			    var $schedule = '';			    
-			    var scheduleData = response.query.results.schedule.service;
-			    
-			    console.log(scheduleData.event);
-			    
-			    if(scheduleData) {
+			$.ajax({ 
+				dataType: 'json',
+				url: 'proxy.php?url='+channel.feedURL,
+				success: function(response) {	
+									    
+					loadingComplete();
+				    var $schedule = '';			    
+				    var scheduleData = response.service;
 				    
-				    $schedule += '<div class="card tvguide"><img class="provider" src="images/provider_'+channel.shortname+'.svg" /><table>';
-				    if(channel.watchURL) { $schedule += '<a class="watch" href="'+channel.watchURL+'" target="_new" title="Horfa á '+channel.name+'">▶︎ Horfa</a>';	}
-					$schedule += '<table>';
-				    	
-				    var row = 1;	    
-					$.each(scheduleData.event, function(i, v) {						
-						if(row<5) {
-							var startTime = moment(v['start-time']);
-							if(startTime>Date.now()) {	
-								$schedule += '<tr><td class="time">'+moment(startTime).format('LT')+'</td>'    
-								$schedule += '<td>'+v.title;
-								if(v['original-title']) {
-									$schedule += '<span>'+v['original-title']+'</span>';
+				    if(scheduleData) {
+					    
+					    $schedule += '<div class="card tvguide"><img class="provider" src="images/provider_'+channel.shortname+'.svg" /><table>';
+					    if(channel.watchURL) { $schedule += '<a class="watch" href="'+channel.watchURL+'" target="_new" title="Horfa á '+channel.name+'">▶︎ Horfa</a>';	}
+						$schedule += '<table>';
+							   
+						var row=1;
+						for(i=0; i<scheduleData.event.length; i++) {
+							if(row<=4) {
+								var startTime = moment(scheduleData.event[i]['@attributes']['start-time']);
+								if(startTime>Date.now()) {	
+									$schedule += '<tr><td class="time">'+moment(startTime).format('LT')+'</td>'    
+									$schedule += '<td>'+scheduleData.event[i].title;
+									if(!jQuery.isEmptyObject(scheduleData.event[i]['original-title'])) {
+										$schedule += '<span>'+scheduleData.event[i]['original-title']+'</span>';
+									}
+									$schedule += '</td></tr>';
+									row++;
 								}
-								$schedule += '</td></tr>';
-								row++;
 							}
+					    }
+					    
+						$schedule += '</table>';
+						
+						if(row>4) {
+							$schedule += '<a class="moreinfo" href="'+channel.url+'" target="_new">Nánar…</a>';
 						}
-				    });
-				    
-					$schedule += '</table>';
-					
-					if(row>4) {
-						$schedule += '<a class="moreinfo" href="'+channel.url+'" target="_new">Nánar…</a>';
-					}
-					
-					if(row==1) {
-						$schedule += '<table><tr><td class="noschedule">Enginn dagskrárliður</td></tr></table>';
-					}
-					
-				    $schedule += '</div>';
-				    
-				    var d = new Date();
-				    if(d.getHours()>17) {
-					    var timePhrase = 'í kvöld';
+						
+						if(row==1) {
+							$schedule += '<table><tr><td class="noschedule">Enginn dagskrárliður</td></tr></table>';
+						}
+						
+					    $schedule += '</div>';
+					    
+					    var d = new Date();
+					    if(d.getHours()>17) {
+						    var timePhrase = 'í kvöld';
+					    } else {
+						    var timePhrase = 'í dag';
+					    }
+					    
+						appendOutput({ output: 'Þetta er dagskráin á '+channel.name+' '+timePhrase+':<br />',
+									   outputData: $schedule, 
+							           outputPhrase: 'Þetta er dagskráin á '+channel.name+' í dag:' });
+							           
 				    } else {
-					    var timePhrase = 'í dag';
+					    
+					    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
+					    
 				    }
-				    
-					appendOutput({ output: 'Þetta er dagskráin á '+channel.name+' '+timePhrase+':<br />',
-								   outputData: $schedule, 
-						           outputPhrase: 'Þetta er dagskráin á '+channel.name+' í dag:' });
-						           
-			    } else {
-				    
-				    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
-				    
-			    }
 			    				   
 				},
-				error: function(error) {		    
+				error: function(error) {
+					console.log(response);		    
 				    loadingComplete();
 				    appendOutput({ output: 'Ég get ekki sótt þessar upplýsingar í augnablikinu.' });
 			    }
@@ -169,24 +163,15 @@ function respondTV(input) {
 
 function stod2Schedule(channel) {
 	
-	var yql = URL = [
-        'https://query.yahooapis.com/v1/public/yql',
-        '?q=' + encodeURIComponent("select * from json where url='"+channel.feedURL+ "'"),
-        '&format=json&callback=?'
-    ].join('');	
-    
-	var request = $.ajax({
-		dataType: 'jsonp',
-		url: yql,
-		type: 'GET',
+	$.ajax({ 
+		dataType: 'json',
+		url: 'proxy.php?url='+channel.feedURL,
 		success: function(response) {
+			
 			loadingComplete();
-			console.log(response);
 			
 			var $schedule = '';			    
-		    var scheduleData = response.query.results.json.json;
-		    
-		    console.log(scheduleData);
+		    var scheduleData = response;
 		    
 		    if(scheduleData.length>0) {
 			    

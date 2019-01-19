@@ -11,11 +11,12 @@ function respondPetrol(input) {
 		}
 		respondLoading();
 		$.ajax({
-			url: 'proxy.php?u=http://apis.is/petrol/',
+			url: 'proxy.php?url=http://apis.is/petrol/',
 			contentType: 'application/json; charset=utf-8',
 			dataType: 'json',
 			type: 'GET',
-			success: function(response) {					    
+			success: function(response) {
+				console.log(response);					    
 				loadingComplete();
 				if(analysis.place) {
 					var outputPhrase = 'Þetta eru lægstu bensínverðin '+analysis.place.prep+' '+decline(analysis.place.placeName,'dat')+':';
@@ -53,8 +54,8 @@ function respondPetrol(input) {
 						var lonDistance = diff(response.results[i].geo.lon,userLon);
 						if(latDistance<0.03 && lonDistance <0.03) {
 							if(j<3) {
-								prices += '<tr><td class="petrol">'+reformatNumber(response.results[i].bensin95)+'</td>';
-								prices += '<td class="diesel">'+reformatNumber(response.results[i].diesel)+'</td>';
+								prices += '<tr><td class="petrol">'+icelandiciseInt(response.results[i].bensin95)+'</td>';
+								prices += '<td class="diesel">'+icelandiciseInt(response.results[i].diesel)+'</td>';
 								prices += '<td>'+response.results[i].company+'<br />';
 								prices += '<span>'+response.results[i].name+'</span></td></tr>';
 								j++;

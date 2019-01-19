@@ -862,7 +862,7 @@ nav .line .speech.off {
 	margin: 6px 0;
 	background: #efefef;
 	clear: both;	
-	font-size: 17px;
+	font-size: 15px;
 	font-weight: bold;
 	padding: 3px 9px;
 }
@@ -890,7 +890,7 @@ nav .line .speech.off {
 }
 
 .card.avalanche .row .forecast {
-	font-size: 17px;
+	font-size: 15px;
 	clear: both;
 }
 

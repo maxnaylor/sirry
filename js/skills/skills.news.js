@@ -114,7 +114,7 @@ function respondNews(input) {
 				                 { feedURL: 'https://www.mbl.is/feeds/nyjast/',
 				                   name: 'Morgunblaðið',			        
 				                   shortName: 'mbl'
-				                 },
+								 },
 				                 { feedURL: 'http://www.visir.is/rss/allt',
 				                   name: 'Vísir',			        
 				                   shortName: 'visir'
@@ -123,7 +123,7 @@ function respondNews(input) {
 				                   name: 'Stundin',			        
 				                   shortName: 'stundin'
 				                 },
-				                 { feedURL: 'http://www.dv.is/feed/',
+				                 { feedURL: 'https://www.dv.is/feed/',
 				                   name: 'DV',			        
 				                   shortName: 'dv'
 				                 }];		
@@ -144,22 +144,17 @@ function respondNews(input) {
 				
 				console.log('Retrieving news from '+providers[i].name+'…');
 			
-				var yql = URL = [
-			        'https://query.yahooapis.com/v1/public/yql',
-			        '?q=' + encodeURIComponent("select title, description, category, link, pubDate from rss where  url='"+providers[i].feedURL+ "'"),
-			        '&format=json&callback=?'
-			    ].join('');	
-			    
-				var request = $.ajax({
-					dataType: 'jsonp',
-					url: yql,
-					type: 'GET',
+				var request = $.ajax({ 
+					dataType: 'json',
+					url: 'proxy.php?url='+providers[i].feedURL,
 					ajaxI: i,
 					success: function(response) {
 						
+						console.log(response.channel);
+						
 						i = this.ajaxI;
 										
-				        $(response.query.results.item).each(function(index, value) {
+				        $(response.channel.item).each(function(index, value) {
 					        if(index>4) { 
 						        return false;
 						    } else {
@@ -176,8 +171,11 @@ function respondNews(input) {
 					    });
 				        console.log('Loaded news from '+providers[i].name+'.');	 					
 						
-					}, error: function() {
-						console.log('Unable to load news from '+providers[i].name+'.');	 
+					}, error: function(response) {
+						
+						console.log('Unable to load news from '+providers[i].name+':');	 
+						console.log(response);
+						
 					}
 				});			
 				

@@ -25,23 +25,14 @@ function respondRadio(input) {
 		
 		console.log('Interpretation: Radio schedule request for '+channel.name);
 		
-		var yql = URL = [
-	        'https://query.yahooapis.com/v1/public/yql',
-	        '?q=' + encodeURIComponent("select service from xml where url='"+channel.feedURL+ "'"),
-	        '&format=json&callback=?'
-	    ].join('');	
-	    
-		var request = $.ajax({
-			dataType: 'jsonp',
-			url: yql,
-			type: 'GET',
-			success: function(response) {
-				
+		$.ajax({ 
+			dataType: 'json',
+			url: 'proxy.php?url='+channel.feedURL,
+			success : function(response) {	
+			    
 				loadingComplete();
 				var $schedule = '';			    
-			    var scheduleData = response.query.results.schedule.service.event;
-			    
-			    console.log(scheduleData);
+			    var scheduleData = response.service.event;
 			    
 			    if(scheduleData.length>0) {
 				    
@@ -49,18 +40,19 @@ function respondRadio(input) {
 				    if(channel.watchURL) { $schedule += '<a class="watch" href="'+channel.watchURL+'" target="_new" title="Hlusta á '+channel.name+'">▶︎ Hlusta</a>';	}
 					$schedule += '<table>';
 				    	
-				    var row = 1;	    
-					$.each(scheduleData, function(i, v) {						
-						if(row<5) {
-							var startTime = moment(v['start-time']);
+				    var row=1;
+						for(i=0; i<scheduleData.length; i++) {						
+						if(row<=4) {
+							var startTime = moment(scheduleData[i]['@attributes']['start-time']);
 							if(startTime>Date.now()) {	
 								$schedule += '<tr><td class="time">'+moment(startTime).format('LT')+'</td>'    
-								$schedule += '<td>'+v.title;
+								$schedule += '<td>'+scheduleData[i].title;
 								$schedule += '</td></tr>';
 								row++;
 							}
 						}
-				    });
+				    }
+				    
 					$schedule += '</table>';
 					if(row>4) {
 						$schedule += '<a class="moreinfo" href="'+channel.url+'" target="_new">Nánar…</a>';
